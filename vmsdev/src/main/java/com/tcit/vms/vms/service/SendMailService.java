@@ -58,6 +58,7 @@ public class SendMailService {
             FileSystemResource resource = new FileSystemResource(new File("VisitorPass.pdf"));
             helper.addAttachment("VisitorPass.pdf",resource);
             javaMailSender.send(msg);
+            log.info("Visitor email send to visitor :{}", visitor.getEmail());
         } catch (MessagingException e) {
             log.error("messaging exception occurred for : {},{}", visitor.getEmail(),e.getMessage());
             e.printStackTrace();
@@ -143,6 +144,7 @@ public class SendMailService {
             helper.setText(htmlStr, true);
 
             javaMailSender.send(msg);
+            log.info("DeclinedEmail email send to visitor :{}", list);
         } catch (MessagingException e) {
             log.error("messaging exception occurred for : {},{}", visit.getVisitor().getEmail(),e.getMessage());
             e.printStackTrace();
@@ -164,6 +166,7 @@ public class SendMailService {
             helper.setText(htmlStr, true);
 
             javaMailSender.send(msg);
+            log.info("sendDeclinedEmailWithHtmlByHost email send to :{}", visits.getVisitor().getEmail());
         } catch (MessagingException e) {
             log.error("messaging exception occurred for : {},{}", visits.getVisitor().getEmail(),e.getMessage());
             e.printStackTrace();

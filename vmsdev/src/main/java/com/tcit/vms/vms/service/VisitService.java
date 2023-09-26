@@ -110,14 +110,15 @@ public class VisitService {
         helper.setTo(visit.getDepartment().getDeptEmail());
         helper.setFrom(sender);
         helper.setSubject("Visit Details");
-        String htmlStr = getHtml(visit);
+        String htmlStr = getHtmlToDept(visit);
         helper.setText(htmlStr, true);
         javaMailSender.send(msg);
+        log.info("sendEmailToDept email send to :{}", visit.getDepartment().getDeptEmail());
         return new ResponseDto("SUCCESS", "Visit Details sent to Host ", "");
     }
     @Autowired
     private ResourceLoader resourceLoader;
-    private String getHtml(Visit visit) {
+    private String getHtmlToDept(Visit visit) {
         Resource resource = resourceLoader.getResource("classpath:approve.html");
 
         try (InputStream inputStream = resource.getInputStream()) {
@@ -126,7 +127,7 @@ public class VisitService {
             StringBuilder stringBuilder = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
-                stringBuilder.append(replaceToken(line, visit));
+                stringBuilder.append(replaceTokenToDept(line, visit));
             }
 
             String htmlContent = stringBuilder.toString();
@@ -140,7 +141,7 @@ public class VisitService {
         }
         return null;
     }
-    private String replaceToken(String data, Visit visit) throws Exception {
+    private String replaceTokenToDept(String data, Visit visit) throws Exception {
         if (data.contains("@@{name}@@")) {
             return data.replace("@@{name}@@", visit.getVisitor().getName());
         }
@@ -187,43 +188,26 @@ public class VisitService {
             return new ResponseDto("Error", "Visit Rejected by host", "");
         }
         return null;
-    }/*
-    public ResponseDto sendEmailToSecurity(Visit visit) throws Exception {
-
-        String data = EncryptUtil.encrypt(visit.getId().toString());
-
-        MimeMessage msg = javaMailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(msg, true);
-
-        List<Staff> securities = staffRepository.findByRoleId(4);
-        helper.setTo(securities.stream().map(Staff::getEmail).collect(Collectors.toList()).toArray(String[]::new));
-        helper.setFrom(sender);
-        helper.setSubject("Visit Details");
-        String htmlStr = getNewHtml(visit);
-        helper.setText(htmlStr, true);
-        javaMailSender.send(msg);
-        return new ResponseDto("SUCCESS", "Visit Details sent to Security ", "");
-    }*/
+    }
 
     public ResponseDto sendEmailToSecurity(Visit visit) throws Exception {
-
-        //String enData=visit.getId().toString()+"@"+visit.getStaff().getRole().getId().equals(4);
-        String enData=visit.getId().toString()+"@"+visit.getStaff().getRole().getId().equals(4);
-        String data = EncryptUtil.encrypt(enData);
         MimeMessage msg = javaMailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(msg, true);
         List<Staff> securities = staffRepository.findByRoleId(4);
-        helper.setBcc(securities.stream().map(Staff::getEmail).collect(Collectors.toList()).toArray(String[]::new));
-        helper.setFrom(sender);
-        helper.setSubject("Visit Details");
-        String htmlStr = getNewHtml(visit);
-        helper.setText(htmlStr, true);
-        javaMailSender.send(msg);
+        for (Staff staff : securities) {
+            MimeMessageHelper helper = new MimeMessageHelper(msg, true);
+            helper.setTo(staff.getEmail());
+            helper.setFrom(sender);
+            helper.setSubject("Visit Details");
+            String htmlStr = getNewHtmlToSecurity(visit, staff);
+            helper.setText(htmlStr, true);
+            javaMailSender.send(msg);
+            log.info("Security email send to :{}", staff.getEmail());
+        }
         return new ResponseDto("SUCCESS", "Visit Details sent to Security ", "");
     }
 
 
-    private String getNewHtml(Visit visit) {
+    private String getNewHtmlToSecurity(Visit visit, Staff staff) {
         Resource resource = resourceLoader.getResource("classpath:approve.html");
 
         try (InputStream inputStream = resource.getInputStream()) {
@@ -232,11 +216,9 @@ public class VisitService {
             StringBuilder stringBuilder = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
-                stringBuilder.append(replaceNewToken(line, visit));
+                stringBuilder.append(replaceTokenToSecurity(line, visit, staff));
             }
             String htmlContent = stringBuilder.toString();
-            // Process the HTML content as needed
-            //System.out.println(htmlContent);
             return htmlContent;
         } catch (IOException | InvalidAlgorithmParameterException | NoSuchPaddingException | IllegalBlockSizeException |
                  NoSuchAlgorithmException | BadPaddingException | InvalidKeyException e) {
@@ -246,7 +228,7 @@ public class VisitService {
         }
         return null;
     }
-    private String replaceNewToken(String data, Visit visit) throws Exception {
+    private String replaceTokenToSecurity(String data, Visit visit, Staff staff) throws Exception {
         if (data.contains("@@{name}@@")) {
             return data.replace("@@{name}@@", visit.getVisitor().getName());
         }
@@ -268,17 +250,11 @@ public class VisitService {
         }
         if (data.contains("@@{accompanies}@@")){
             return  data.replace("@@{accompanies}@@", visit.getAccompanyCount().toString());
-            // return  data.replace((CharSequence) "@@{accompanies}@@", (CharSequence) visit.getAccompanies()).toString());
         }
-        /*if (data.contains("@@{url}@@")) {
-            String link = "http://vms.tcit.ae/#/approvevisit?id=";
-            link = link + EncryptUtil.encrypt(visit.getId().toString()) + "&type=security&SecurityId=" ;
-            return data.replace("@@{url}@@", link);
-        }*/
+
         if (data.contains("@@{url}@@")) {
             String link = "http://vms.tcit.ae/#/approvevisit?id=";
-           // link = link + EncryptUtil.encrypt(visit.getId().toString()) + "&type=security&getSecurityId=" +EncryptUtil.encrypt(String.valueOf(visit.getStaff().getRole().getId().equals(4)));
-            link = link + EncryptUtil.encrypt(visit.getId().toString()) + "&type=security&getSecurityId=" ;
+            link = link + EncryptUtil.encrypt(visit.getId().toString()) + "&type=security&securityId=" + EncryptUtil.encrypt(staff.getId().toString()) ;
             return data.replace("@@{url}@@", link);
         }
         return data;
@@ -323,52 +299,6 @@ public class VisitService {
       face.setQuality(Double.valueOf("0.0"));
         return request;
    }
-    private String replaceNewToken(String data, Visit visit, Visitor visitor) throws Exception {
-        if (data.contains("@@{name}@@")) {
-            return data.replace("@@{name}@@", visit.getVisitor().getName());
-        }
-        if (data.contains("@@{email}@@")) {
-            return data.replace("@@{email}@@", visit.getVisitor().getEmail());
-        }
-        if (data.contains("@@{mobileNo}@@")) {
-            return data.replace("@@{mobileNo}@@", visit.getVisitor().getMobileNo());
-        }
-        if (data.contains("@@{visitorType}@@")) {
-            return data.replace("@@{visitorType}@@", visit.getVisitor().getVisitorType().getName());
-        }
-        if (data.contains("@@{dateOfVisit}@@")) {
-            return data.replace("@@{dateOfVisit}@@", visit.getDateOfVisit().toString());
-        }
-        if (data.contains("@@{duration}@@")) {
-            return data.replace("@@{duration}@@", visit.getDuration());
-        }
-        if (data.contains("@@{url}@@")) {
-            String link = "http://vms.tcit.ae/#/approvevisit?id=";
-            link = link + EncryptUtil.encrypt(visit.getId().toString()) + "&type=security&SecurityId=";//+visit.getStaff().getId();
-            return data.replace("@@{url}@@", link);
-        }
-        return data;
-    }
-
-    private String replaceVisitorToken(String data, Visit visit) {
-
-        if (data.contains("@@{name}@@")) {
-            return data.replace("@@{name}@@", visit.getVisitor().getName());
-        }
-        if (data.contains("@@{mobileNo}@@")) {
-            return data.replace("@@{mobileNo}@@", visit.getVisitor().getMobileNo());
-        }
-        if (data.contains("@@{email}@@")) {
-            return data.replace("@@{email}@@", visit.getVisitor().getEmail());
-        }
-        if (data.contains("@@{visitorType}@@")) {
-            return data.replace("@@{visitorType}@@", visit.getVisitor().getVisitorType().getName());
-        }
-        if (data.contains("@@{duration}@@")) {
-            return data.replace("@@{duration}@@", visit.getDuration());
-        }
-        return data;
-    }
 
     public VisitResponseDto getVisitDetailsByVisitId(Integer id) {
         Optional<Visit> optionalVisit = Optional.ofNullable(visitRepository.findByIdAndIsActive(id, true).orElseThrow(() -> new UserNotFoundException("Visit not found or InActive!!!!!")));

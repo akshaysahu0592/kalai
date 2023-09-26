@@ -203,6 +203,7 @@ public class StaffService {
         String htmlStr= getHtml(staff.getStaffName(),text);
         helper.setText(htmlStr,true);
         javaMailSender.send(msg);
+        log.info("forgotPassword email send to :{}", staff.getEmail());
         return new ResponseDto("SUCCESS", "Id and Expiry date details has been sent to your mail id ", staff.getEmail());
     }
    public ResponseDto resetPassword(ResetPasswordDto resetPasswordDto) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException, ClassNotFoundException, MessagingException {

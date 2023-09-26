@@ -143,29 +143,6 @@ public class VisitorService {
 
 
 
-            //  Check if the mobile number is already in use (soft deleted or not)
-        /*public boolean isMobileNumberExists(v visitorId,String  mobileNo){
-                Optional<Visitor> existingVisitor = visitorRepository.findByMobileNo(visitor.getMobileNo());
-                if (existingVisitor.isPresent()) {
-                    if (!existingVisitor.get().isActive()) {
-                        // If the mobile number was soft deleted, restore it
-                        existingVisitor.get().isActive();
-                        return visitorRepository.save(existingVisitor.get());
-                    } else {
-                        // Handle duplicate mobile number error
-                        throw new IllegalArgumentException("Mobile number is already in use.");
-                    }
-                }
-
-
-    }*/
-    /*public boolean isVisitEntryExits(Integer visitorId, LocalDateTime dateOfVisit) {
-                Optional<List<Visit>> result = visitService.findByVisitorIdAndDateOfVisit(visitorId, dateOfVisit);
-                if (result.isPresent()) {
-                    return !result.get().isEmpty();
-                }
-                return false;
-            }*/
     private VisitAccompany createVisitAccompany(Visit visit, Visitor acc) throws IOException {
 
         VisitAccompany visitAccompany = VisitAccompany.builder()
