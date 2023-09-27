@@ -40,20 +40,7 @@ public class VisitController {
         return visitService.GetVisitByVisitId(visitByVistIdDto);
     }
 
-    /*@GetMapping("/GetVisitByVisitId/{id}")
-    public ResponseEntity<VisitResponseDto> getVisitByVisitId(@PathVariable Integer id) {
-        VisitResponseDto dto = visitService.getVisitByVisitId(id);
-        if (dto != null) {
-            return new ResponseEntity<>(dto, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }*/
-   /* @GetMapping("/GetVisitByVisitId/{id}")
-    public VisitResponseDto GetVisitByVisitId(@PathVariable String id) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, IOException, InvalidKeyException, BadPaddingException, ClassNotFoundException {
-        return visitService.GetVisitByVisitId(id);
 
-    }*/
     @GetMapping("/GetVisitDetailsbyVisitorid/{id}")
     public ResponseEntity<VisitResponseDto> getVisitbyVisitorid(@PathVariable Integer id) {
         VisitResponseDto dto = visitService.getVisitDetailsByVisitorId(id);

@@ -11,7 +11,7 @@ public interface VisitorRepository extends JpaRepository <Visitor,Integer> {
     List<Visitor> findByVisitingDate(String startDate, String endDate);
     @Query(value = "select * from visitor v join visits vv where v.id=vv.visitorid and vv.staffid=?1",nativeQuery = true)
     List<Visitor> findVisitorsByStaffId(Integer staffId);
-    Optional<Visitor> findByMobileNo(String mobileNo);
+    List<Visitor> findByMobileNo(String mobileNo);
     @Query("from Visitor  where  isActive=true and name like %?1%  or mobileNo like %?1% and isActive=true or  email like %?1% and isActive=true")
     List<Visitor> findAllVisitorsWithFilters(String search);
     Optional<Visitor> findByEmail(String email);

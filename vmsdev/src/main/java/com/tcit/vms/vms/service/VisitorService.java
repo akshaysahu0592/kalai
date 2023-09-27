@@ -16,6 +16,7 @@ import com.tcit.vms.vms.repository.VisitorRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -104,10 +105,15 @@ public class VisitorService {
         return responseDto;
     }
     private Visitor creatingVisitor(VisitRequestCreateDto visitRequestDto) throws IOException {
-        Visitor visitor = visitorRepository.findByMobileNo(visitRequestDto.getMobileNo()).orElse(null);
+        List<Visitor> visitors = visitorRepository.findByMobileNo(visitRequestDto.getMobileNo());
+        Visitor visitor = null;
+        if (visitors != null && !visitors.isEmpty()) {
+            visitor = visitors.stream().filter(e->e.isActive()).findFirst().orElse(null);
+        }
+
         VisitorType visitorType = visitorTypeService.getvisitorTypeById(visitRequestDto.getVisitorTypeId());
 
-        if (visitor == null || !visitor.isActive()) {
+        if (visitor == null) {
 
             visitor = Visitor.builder()
                     .name(visitRequestDto.getName())
@@ -118,10 +124,6 @@ public class VisitorService {
                     .createdDate(LocalDateTime.now())
                     .isActive(true)
                     .build();
-        } else {
-            if (!visitor.isActive()) {
-                throw new ApplicationValidationException(" Visitor is not active ");
-            }
         }
         if (visitRequestDto.getEmiratesId() != null) {
             visitor.setEmiratesId(visitRequestDto.getEmiratesId());
@@ -129,7 +131,7 @@ public class VisitorService {
         visitor = visitorRepository.save(visitor);
 
         if (visitRequestDto.getProfPicture() != null && !visitRequestDto.getProfPicture().isEmpty()) {
-            log.info("Upload Picture for VisitorId# {}", visitor.getId());
+            log.info("Upload Picture for VisitorId : {}", visitor.getId());
             String imageBase64 = visitRequestDto.getProfPicture();
             ResponseDto responseDto = storageService.uploadImage(visitRequestDto.getProfPicture(),
                     visitor.getId(),
@@ -140,7 +142,6 @@ public class VisitorService {
         }
         return visitor;
     }
-
 
 
     private VisitAccompany createVisitAccompany(Visit visit, Visitor acc) throws IOException {
@@ -252,7 +253,7 @@ public class VisitorService {
         return visitorRepository.findByEmail(email).orElseThrow();
     }
     public ResponseDto addVisitor(VisitorRequestDto dto) {
-        Visitor visitor = visitorRepository.findByMobileNo(dto.getMobileNo()).orElse(null);
+        Visitor visitor;
         ResponseDto responseDto = null;
         try {
              visitor = Visitor.builder()

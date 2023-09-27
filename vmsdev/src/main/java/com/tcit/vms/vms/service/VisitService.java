@@ -261,7 +261,6 @@ public class VisitService {
     }
    public ResponseDto approveOrRejectVisitorBySecurity(SecurityApproveRejectDto securityApproveRejectDto, boolean sendMailToVisitor) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, IOException, InvalidKeyException, BadPaddingException, MessagingException {
 
-        //visitRepository.updateApprovedBySecurity( securityApproveRejectDto.getVisitId(),securityApproveRejectDto.getApprovedBySecurity(),securityApproveRejectDto.getReason(),securityApproveRejectDto.getComments(),securityApproveRejectDto.getApprovedBySecurityId());
         visitRepository.updateApprovedBySecurity( securityApproveRejectDto.getVisitId(),securityApproveRejectDto.getApprovedBySecurity(),securityApproveRejectDto.getReason(),securityApproveRejectDto.getComments());
         Visit visit = visitRepository.findById(securityApproveRejectDto.getVisitId()).orElseThrow();
         if (securityApproveRejectDto.getApprovedBySecurity() == 1 && sendMailToVisitor) {

@@ -76,15 +76,11 @@ public class SendMailService {
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             StringBuilder stringBuilder = new StringBuilder();
             String line;
-            // String imageLink=imageUrl+"outputs"+visit.getVisitor().getId()+"cryptograph.png";
-            //String imageLink=imageUrl+visit.getVisitor().getId()+"/"+visit.getVisitor().getId()+".png";
             while ((line = reader.readLine()) != null) {
                 stringBuilder.append(replaceVisitorToken(line, visit, visitor));
             }
 
             String htmlContent = stringBuilder.toString();
-            // Process the HTML content as needed
-            //System.out.println(htmlContent);
             return htmlContent;
         } catch (IOException e) {
             e.printStackTrace();

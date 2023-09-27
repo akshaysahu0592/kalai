@@ -28,7 +28,7 @@ public class Visitor implements Serializable {
     @Size(min = 3, max = 40 )
     @NotNull(message="name is Mandatory" )
     private String name;
-    @Column (name="mobileno", unique = true)
+    @Column (name="mobileno", unique = false)
     @Pattern(regexp = "^\\+971\\d{9}$", message = "Invalid UAE mobile number format. It should start with +971 followed by 9 digits.")
     private String mobileNo;
     @Email(message = "Email must follow the formatter: ***@***")
