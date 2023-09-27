@@ -111,9 +111,8 @@ public class VisitorService {
             visitor = visitors.stream().filter(e->e.isActive()).findFirst().orElse(null);
         }
 
-        VisitorType visitorType = visitorTypeService.getvisitorTypeById(visitRequestDto.getVisitorTypeId());
-
         if (visitor == null) {
+            VisitorType visitorType = visitorTypeService.getvisitorTypeById(visitRequestDto.getVisitorTypeId());
 
             visitor = Visitor.builder()
                     .name(visitRequestDto.getName())
