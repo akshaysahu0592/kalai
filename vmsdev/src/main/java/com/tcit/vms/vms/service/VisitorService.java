@@ -124,6 +124,8 @@ public class VisitorService {
                     .createdDate(LocalDateTime.now())
                     .isActive(true)
                     .build();
+        } else {
+            throw new ApplicationValidationException("An active user found with same mobile : " + visitRequestDto.getMobileNo());
         }
         if (visitRequestDto.getEmiratesId() != null) {
             visitor.setEmiratesId(visitRequestDto.getEmiratesId());
