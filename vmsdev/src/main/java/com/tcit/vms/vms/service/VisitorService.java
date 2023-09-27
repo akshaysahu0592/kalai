@@ -249,9 +249,7 @@ public class VisitorService {
         String endDate = localDateTime.format(df);
         return visitorRepository.findByVisitingDate(startDate, endDate);
     }
-    public Visitor getVisitorDetailsByEmail(String email) {
-        return visitorRepository.findByEmail(email).orElseThrow();
-    }
+
     public ResponseDto addVisitor(VisitorRequestDto dto) {
         Visitor visitor;
         ResponseDto responseDto = null;
