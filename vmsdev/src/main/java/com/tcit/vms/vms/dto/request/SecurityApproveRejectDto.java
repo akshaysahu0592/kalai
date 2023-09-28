@@ -16,6 +16,6 @@ public class SecurityApproveRejectDto {
     private Integer approvedBySecurity;
     private Integer reason;
     private String comments;
-
+    private String approvedBySecurityId;
 
 }

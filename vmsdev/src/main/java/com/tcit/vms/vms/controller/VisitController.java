@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class VisitController {
-    //testing
+
     @Autowired
     private VisitService visitService;
 
@@ -34,13 +34,10 @@ public class VisitController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
     @PostMapping("/GetVisitByVisitId")
     public VisitResponseDto GetVisitByVisitId(@RequestBody VisitByVistIdDto visitByVistIdDto) throws Exception {
         return visitService.GetVisitByVisitId(visitByVistIdDto);
     }
-
-
     @GetMapping("/GetVisitDetailsbyVisitorid/{id}")
     public ResponseEntity<VisitResponseDto> getVisitbyVisitorid(@PathVariable Integer id) {
         VisitResponseDto dto = visitService.getVisitDetailsByVisitorId(id);
@@ -103,5 +100,4 @@ public class VisitController {
     public ResponseDto approveOrRejectVisitorBySecurity(@RequestBody SecurityApproveRejectDto securityApproveRejectDto) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, IOException, InvalidKeyException, BadPaddingException, MessagingException {
         return visitService.approveOrRejectVisitorBySecurity(securityApproveRejectDto,true );
     }
-
 }

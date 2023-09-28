@@ -49,7 +49,6 @@ public class VisitService {
     private VisitRepository visitRepository;
     @Autowired
     private VisitAccompanyRepository visitAccompanyRepository;
-
     @Autowired
     private CampusService campusService;
     @Autowired
@@ -70,8 +69,6 @@ public class VisitService {
     private CryptoGeneration cryptoGeneration;
     @Autowired
     private BiometricsService biometricsService;
-
-
    public Visit createVisit(VisitRequestCreateDto visitRequestDto, Visitor visitor) throws InvalidAlgorithmParameterException, MessagingException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, IOException, BadPaddingException, InvalidKeyException {
         Staff staff=null;
         if(visitRequestDto.getStaffId()!=null)
@@ -85,7 +82,6 @@ public class VisitService {
                 .duration(visitRequestDto.getDuration())
                 .campus(campusService.getCampusById(visitRequestDto.getCampusId()))
                 .department((departmentService.getDepartmentById(visitRequestDto.getDepartmentId())))
-
                 .staff(staff)
                 .agenda(visitRequestDto.getAgenda())
                 .accompanyCount(visitRequestDto.getAccompanyCount())
@@ -259,20 +255,22 @@ public class VisitService {
         }
         return data;
     }
-   public ResponseDto approveOrRejectVisitorBySecurity(SecurityApproveRejectDto securityApproveRejectDto, boolean sendMailToVisitor) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, IOException, InvalidKeyException, BadPaddingException, MessagingException {
+    public ResponseDto approveOrRejectVisitorBySecurity(SecurityApproveRejectDto securityApproveRejectDto, boolean sendMailToVisitor) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, IOException, InvalidKeyException, BadPaddingException, MessagingException {
 
-        visitRepository.updateApprovedBySecurity( securityApproveRejectDto.getVisitId(),securityApproveRejectDto.getApprovedBySecurity(),securityApproveRejectDto.getReason(),securityApproveRejectDto.getComments());
+        visitRepository.updateApprovedBySecurity(securityApproveRejectDto.getApprovedBySecurity(), securityApproveRejectDto.getVisitId(),securityApproveRejectDto.getReason(),securityApproveRejectDto.getComments(),securityApproveRejectDto.getApprovedBySecurityId());
         Visit visit = visitRepository.findById(securityApproveRejectDto.getVisitId()).orElseThrow();
         if (securityApproveRejectDto.getApprovedBySecurity() == 1 && sendMailToVisitor) {
             if (visit.getVisitor().getCryptograph()== null) {
                 cryptoGeneration.generation(visit);
-
+                visitorRepository.save(visit.getVisitor());
                 Request request = getRequest(visit);
+
                 biometricsService.enroll(request);
             }
-                sendMailService.sendEmailToVisitor(visit);
-                return new ResponseDto("SUCCESS", "Visit approved by Security", "");
-            }
+            sendMailService.sendEmailToVisitor(visit);
+            return new ResponseDto("SUCCESS", "Visit approved by Security", "");
+        }
+
 
         if (securityApproveRejectDto.getApprovedBySecurity() == 2 && sendMailToVisitor) {
             visit.setStatus("Declined");

@@ -21,13 +21,13 @@ public interface VisitRepository extends JpaRepository<Visit,Integer>,CustomVisi
     @Modifying
     @Query(value = "update visits set approvedbyhost=?1, reasonid=?3, comments=?4  where id=?2" , nativeQuery = true)
     void updateApprovedByHost(Integer approvedbyhost,Integer id ,Integer reasonid, String comments);
-    /*@Modifying
-    @Query(value = "update visits set approvedbysecurity=?1 , reasonid=?3, comments=?4 ,approvedbysecurityid=?5 where id=?2 "  , nativeQuery = true)
-    void updateApprovedBySecurity( Integer approvedbysecurity,Integer id,Integer reasonid, String comments,Integer approvedBySecurityId);*/
-
     @Modifying
+    @Query(value = "update visits set approvedbysecurity=?1 , reasonid=?3, comments=?4 ,approvedbysecurityid=?5 where id=?2 "  , nativeQuery = true)
+    void updateApprovedBySecurity( Integer approvedbysecurity,Integer id,Integer reasonid, String comments,String approvedBySecurityId);
+
+    /*@Modifying
     @Query(value = "update visits set approvedbysecurity=?1 , reasonid=?3, comments=?4 where id=?2 "  , nativeQuery = true)
-    void updateApprovedBySecurity( Integer approvedbysecurity,Integer id,Integer reasonid, String comments);
+    void updateApprovedBySecurity( Integer approvedbysecurity,Integer id,Integer reasonid, String comments);*/
      @Modifying
      @Query(value ="update visits set status='Missed' where status='Pending' and dateofvisit<?1", nativeQuery=true)
      void updateStatus(LocalDateTime dateOfVisit);
