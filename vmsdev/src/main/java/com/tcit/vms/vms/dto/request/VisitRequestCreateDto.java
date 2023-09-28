@@ -39,6 +39,5 @@ public class VisitRequestCreateDto {
     private Boolean isActive=true;
     private String imageBase64;
     private List<VisitorAccompanyDto> accompanyDetails;
-    //private List<VisitAccompanyDto> accompanyDtos;
 
 }
