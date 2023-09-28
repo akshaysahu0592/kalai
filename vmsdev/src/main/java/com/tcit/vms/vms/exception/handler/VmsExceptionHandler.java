@@ -6,9 +6,11 @@ import com.tcit.vms.vms.exception.UserNotFoundException;
 import com.tcit.vms.vms.exception.VisitorNotFoundException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
 public class VmsExceptionHandler {
@@ -35,7 +37,7 @@ public class VmsExceptionHandler {
         return ResponseEntity.internalServerError().body(responseDto);
 
     }
-
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value={
             ApplicationValidationException.class
     })
