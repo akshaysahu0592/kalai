@@ -74,8 +74,17 @@ public class StaffService {
    /* public Staff getStaffById(Integer id) {
         return staffRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Staff not found!!!!!"));
     }*/
-   public Staff getStaffById(Integer id) {
+  /* public Staff getStaffById(Integer id) {
+
        return staffRepository.findById(id).get();
+   }*/
+   public Staff getStaffById(Integer id) {
+       Optional<Staff> staff=staffRepository.findById(id);
+       if(staff.isPresent())
+       {
+           return staff.get();
+       }
+       throw new UserNotFoundException("Staff not found");
    }
     public Staff getStaffProfileById(Integer id) {
         return staffRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Staff not found!!!!!"));

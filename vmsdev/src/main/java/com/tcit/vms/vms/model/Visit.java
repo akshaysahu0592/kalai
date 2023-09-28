@@ -65,7 +65,7 @@ Visit implements Serializable {
     private Reason reason;
     private String comments;
     @Column(name="approvedbysecurityid")
-    private Integer approvedBySecurityId;
+    private String approvedBySecurityId;
 
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinTable(

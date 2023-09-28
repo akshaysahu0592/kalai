@@ -68,13 +68,11 @@ public class VisitorController {
     }
     @GetMapping("/todayVisitor")
     public List<Visitor> getVisitorByToday() {
-
         List<Visitor> visitorDetails = visitorService.getAllVisitorDetailsByToday();
         return visitorDetails;
     }
     @PostMapping("/AddVisitor")
     public ResponseDto addVisitor(@RequestBody VisitorRequestDto dto) throws IOException {
-
         return visitorService.addVisitor(dto);
           //new ResponseDto("","Visitor Created Successfully","");
     }
