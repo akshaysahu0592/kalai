@@ -252,40 +252,54 @@ public class VisitorService {
         String endDate = localDateTime.format(df);
         return visitorRepository.findByVisitingDate(startDate, endDate);
     }
-
     public ResponseDto addVisitor(VisitorRequestDto dto) {
-        Visitor visitor;
-        ResponseDto responseDto = null;
-        try {
-             visitor = Visitor.builder()
-                    .id(dto.getVisitorId())
-                    .name(dto.getName())
-                    .mobileNo(dto.getMobileNo())
-                    .email(dto.getEmail())
-                    .visitorType(visitorTypeService.getVisitorTypeById(dto.getVisitorTypeId()))
+        List<Visitor> visitors = visitorRepository.findByMobileNo(dto.getMobileNo());
+        Visitor visitor = null;
+        ResponseDto responseDto=null;
 
-                    .emiratesId(dto.getEmiratesId())
-                    .createdDate(LocalDateTime.now())
-                    .isActive(true)
-                    .build();
-            visitorRepository.save(visitor);
-            if (dto.getProfPicture() != null && !dto.getProfPicture().isEmpty()) {
-                log.info("Upload Picture for VisitorId# {}", visitor.getId());
-                responseDto = storageService.uploadImage(dto.getProfPicture(),
-                        visitor.getId(),
-                        dto.getFileType() == null ? "jpg" : dto.getFileType(),
-                        "VISITOR");
-                dto.setProfPicture((String) responseDto.getData());
-                visitor = visitorRepository.save(visitor);
-            }
-            responseDto = new ResponseDto("SUCCESS", "Visitor Created ", "");
-            return responseDto;
-        } catch (Exception e) {
-            e.getStackTrace();
-            responseDto = new ResponseDto("Error", "Mobile Number already exists ", "");
+        if (visitors != null && !visitors.isEmpty()) {
+            visitor = visitors.stream().filter(e -> e.isActive()).findFirst().orElse(null);
         }
-        return responseDto;
+
+
+        if (visitor == null) {
+
+            try {
+                visitor = Visitor.builder()
+                        .id(dto.getVisitorId())
+                        .name(dto.getName())
+                        .mobileNo(dto.getMobileNo())
+                        .email(dto.getEmail())
+                        .visitorType(visitorTypeService.getVisitorTypeById(dto.getVisitorTypeId()))
+
+                        .emiratesId(dto.getEmiratesId())
+                        .createdDate(LocalDateTime.now())
+                        .isActive(true)
+                        .build();
+                visitorRepository.save(visitor);
+                if (dto.getProfPicture() != null && !dto.getProfPicture().isEmpty()) {
+                    log.info("Upload Picture for VisitorId# {}", visitor.getId());
+                    responseDto = storageService.uploadImage(dto.getProfPicture(),
+                            visitor.getId(),
+                            dto.getFileType() == null ? "jpg" : dto.getFileType(),
+                            "VISITOR");
+                    dto.setProfPicture((String) responseDto.getData());
+                    visitorRepository.save(visitor);
+
+
+                }
+                responseDto = new ResponseDto("SUCCESS", "Visitor Created ", "");
+                // return responseDto;
+            } catch (Exception e) {
+                e.getStackTrace();
+
+            }
+
+            return responseDto;
+        }throw new ApplicationValidationException("Mobile Number already exists");
     }
+
+
 }
 
 
