@@ -61,7 +61,7 @@ public class VisitorService {
              }
 
              Visit visit = visitService.createVisit(visitRequestDto, visitor);
-            if (visitRequestDto.getAccompanyDetails() != null && !visitRequestDto.getAccompanyDetails().isEmpty()) {
+            if ((visitRequestDto.getCreatedBy().equals("host") || visitRequestDto.getCreatedBy().equals("security")) && visitRequestDto.getAccompanyDetails() != null && !visitRequestDto.getAccompanyDetails().isEmpty()) {
                 visitRequestDto.getAccompanyDetails().stream().forEach(e -> {
                     VisitRequestCreateDto dto = new VisitRequestCreateDto();
                     dto.setName(e.getName());
@@ -101,7 +101,7 @@ public class VisitorService {
         catch (Exception e) {
             e.printStackTrace();
            //responseDto = new ResponseDto("Error", "Visitor mobile number already exists", "");
-            throw new  ApplicationValidationException("Visitor mobile number already exists");
+            throw new  ApplicationValidationException("Exception occurred please check the log");
         }
         return responseDto;
     }
@@ -125,9 +125,7 @@ public class VisitorService {
                     .createdDate(LocalDateTime.now())
                     .isActive(true)
                     .build();
-        } /*else {
-            throw new ApplicationValidationException("An active user found with same mobile : " + visitRequestDto.getMobileNo());
-        }*/
+        }
         if (visitRequestDto.getEmiratesId() != null) {
             visitor.setEmiratesId(visitRequestDto.getEmiratesId());
         }

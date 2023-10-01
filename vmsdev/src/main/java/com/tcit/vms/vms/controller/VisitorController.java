@@ -32,7 +32,7 @@ public class VisitorController {
     @Autowired
     private VisitorRepository visitorRepository;
 
-    @PostMapping("/createVisitorDetails")
+    @PostMapping("/createVisitDetails")
     public ResponseDto createVisitorDetails(@RequestBody VisitRequestCreateDto visitRequestDto) throws IOException {
         return visitorService.createVisitor(visitRequestDto);
     }

@@ -35,7 +35,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             "/api/GetStaffByStaffIdList/",
             "api/approveOrRejectVisitorByHost",
             "api/approveOrRejectVisitorBySecurity",
-            "/api/createVisitorDetails",
+            "/api/createVisitDetails",
             "/api/forgot-password",
             "/api/reset-password",
             "/api/GetVisitByVisitId",

@@ -58,7 +58,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/api/GetStaffsList",
             "/api/GetStaffsByDepartmentIdList/**",
             "/api/GetStaffByStaffIdList/**",
-            "/api/createVisitorDetails",
+            "/api/createVisitDetails",
             "/api/forgot-password",
             "/api/reset-password",
             "/api/GetVisitByVisitId",
