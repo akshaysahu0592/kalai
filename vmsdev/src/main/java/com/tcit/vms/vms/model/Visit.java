@@ -15,12 +15,12 @@ import java.util.List;
 @Builder
 @Table(name="visits")
 @JsonIgnoreProperties
-public class
-Visit implements Serializable {
+public class Visit implements Serializable {
     private static final long serialVersionUID=1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="id")
     private Integer id;
     @ManyToOne
     @JoinColumn(name = "visitorid")
@@ -67,11 +67,11 @@ Visit implements Serializable {
     @Column(name="approvedbysecurityid")
     private String approvedBySecurityId;
 
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "visitaccompany",
-            joinColumns = @JoinColumn(name = "visitid"),
-            inverseJoinColumns = @JoinColumn(name = "visitorid")
+            joinColumns = @JoinColumn(name = "Visitid"),
+            inverseJoinColumns = @JoinColumn(name = "Visitorid")
     )
     private List<Visitor> accompanies;
 }

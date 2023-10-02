@@ -6,17 +6,14 @@ import com.tcit.vms.vms.dto.response.SearchVisitorResponseDto;
 import com.tcit.vms.vms.exception.ApplicationValidationException;
 import com.tcit.vms.vms.exception.UserNotFoundException;
 import com.tcit.vms.vms.model.Visit;
-import com.tcit.vms.vms.model.VisitAccompany;
 import com.tcit.vms.vms.model.Visitor;
 import com.tcit.vms.vms.model.VisitorType;
 import com.tcit.vms.vms.repository.StaffRepository;
-import com.tcit.vms.vms.repository.VisitAccompanyRepository;
 import com.tcit.vms.vms.repository.VisitRepository;
 import com.tcit.vms.vms.repository.VisitorRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -34,8 +31,6 @@ public class VisitorService {
     private VisitRepository visitRepository;
     @Autowired
     private VisitService visitService;
-    @Autowired
-    private VisitAccompanyRepository visitAccompanyRepository;
     @Autowired
     private SendMailService sendMailService;
     @Autowired
@@ -145,15 +140,14 @@ public class VisitorService {
     }
 
 
-    private VisitAccompany createVisitAccompany(Visit visit, Visitor acc) throws IOException {
+    private void createVisitAccompany(Visit visit, Visitor acc) throws IOException {
 
-        VisitAccompany visitAccompany = VisitAccompany.builder()
-                .visit(visit)
-                .visitor(acc)
-                .isActive(true)
-                .build();
-        visitAccompany = visitAccompanyRepository.save(visitAccompany);
-        return visitAccompany;
+        List<Visitor> accompanies = visit.getAccompanies();
+        if(Objects.isNull(accompanies) || accompanies.isEmpty())
+            accompanies = new ArrayList<>();
+        accompanies.add(acc);
+        visit.setAccompanies(accompanies);
+        visitRepository.save(visit);
     }
     public boolean isVisitEntryExits(Integer visitorId, LocalDateTime dateOfVisit) {
         Optional<List<Visit>> result = visitService.findByVisitorIdAndDateOfVisit(visitorId, dateOfVisit);

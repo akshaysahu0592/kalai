@@ -171,11 +171,9 @@ public class CryptoGeneration {
 
         return null;
     }
-    public void generation(Visitor visitor, LocalDateTime dateOfVisit) {
-
+    public String generation(Visitor visitor, LocalDateTime dateOfVisit) {
+        String refId = null;
         properties = Utility.getProperties(resourceLoader);
-
-        //outputDirectory = String.valueOf(System.currentTimeMillis());
 
         if (properties != null) {
 
@@ -183,7 +181,7 @@ public class CryptoGeneration {
             String url = properties.getProperty("idencodeBaseUrl");
 
             try {
-                Integer refId = generateCryptograph(url, visitor, dateOfVisit);
+                refId = generateCryptograph(url, visitor, dateOfVisit);
                 log.info("Cryptograph Generated for visitor:{}", visitor.getId());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -192,20 +190,18 @@ public class CryptoGeneration {
         } else {
             log.info("error reading properties file for visitor:{}", visitor.getId());
         }
+        return refId;
     }
-    private Integer generateCryptograph(String url, Visitor visitor, LocalDateTime dateOfVisit)
+    private String generateCryptograph(String url, Visitor visitor, LocalDateTime dateOfVisit)
             throws IOException {
         final CryptoGenerationResponse cryptoGenerationResponse = new CryptoGenerationResponse();
         ArrayList<MultipartBody.Part> parts = new ArrayList<>();
-// face image
-        //byte[] faceImageBytes = Base64.getDecoder().decode(visitorDetails.getVisitor().getProfPicture());
         byte[] faceImageBytes=new FileInputStream("C:\\Projects\\VMSMedia\\image\\VISITOR\\"+visitor.getId()+"\\"+visitor.getProfPicture()).readAllBytes();
         if (faceImageBytes.length>0) {
             parts.add(Utility.byteArrayToMultipart("face_image", faceImageBytes, "face.jpg", "image/jpeg"));
         } else {
             throw new RuntimeException("Face image file not exists");
         }
-//demog
         MultipartBody.Part demographics = null;
         String txt = Arrays.asList(visitor.getName(), dateOfVisit.toString(), visitor.getEmail(), visitor.getId().toString())
                 .stream()
@@ -245,7 +241,6 @@ public class CryptoGeneration {
 
                         } else if (response.code() == 200 && response.body() != null && response.body().image != null) {
 
-                            System.out.println("crypto generation success");
 
 
 
@@ -300,9 +295,8 @@ public class CryptoGeneration {
             throw new RuntimeException(e);
         }
 
-        visitor.setCryptograph(cryptoGenerationResponse.getImage());
 
-        return visitor.getId();
+        return cryptoGenerationResponse.getPath();
     }
     private Pipeline getPipeline(LocalDateTime dateOfVisit){
         Pipeline pipeline = new Pipeline();

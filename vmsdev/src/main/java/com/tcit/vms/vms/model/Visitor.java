@@ -9,6 +9,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -45,4 +46,6 @@ public class Visitor implements Serializable {
     private LocalDateTime createdDate;
     @Column(name="isactive")
     private boolean isActive=true;
+
+
 }

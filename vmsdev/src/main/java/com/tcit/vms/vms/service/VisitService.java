@@ -48,8 +48,6 @@ public class VisitService {
     @Autowired
     private VisitRepository visitRepository;
     @Autowired
-    private VisitAccompanyRepository visitAccompanyRepository;
-    @Autowired
     private CampusService campusService;
     @Autowired
     private CampusRepository campusRepository;
@@ -261,7 +259,9 @@ public class VisitService {
         Visit visit = visitRepository.findById(securityApproveRejectDto.getVisitId()).orElseThrow();
         if (securityApproveRejectDto.getApprovedBySecurity() == 1 && sendMailToVisitor) {
             if (visit.getVisitor().getCryptograph()== null) {
-                cryptoGeneration.generation(visit.getVisitor(), visit.getDateOfVisit());
+                String crypto = cryptoGeneration.generation(visit.getVisitor(), visit.getDateOfVisit());
+                Visitor visitor = visitorRepository.findById(visit.getVisitor().getId()).get();
+                visitor.setCryptograph(crypto);
                 visitorRepository.save(visit.getVisitor());
                 Request request = getRequest(visit.getVisitor());
                 biometricsService.enroll(request);
@@ -269,8 +269,10 @@ public class VisitService {
             if(visit.getAccompanies()!=null && visit.getAccompanies().size()>0)
             {
                 visit.getAccompanies().stream().forEach(e->{
-                    cryptoGeneration.generation(e, visit.getDateOfVisit());
-                    visitorRepository.save(e);
+                    String crypto = cryptoGeneration.generation(e, visit.getDateOfVisit());
+                    Visitor visitor = visitorRepository.findById(e.getId()).get();
+                    visitor.setCryptograph(crypto);
+                    visitorRepository.save(visitor);
                     try {
                         Request request = getRequest(e);
                         biometricsService.enroll(request);

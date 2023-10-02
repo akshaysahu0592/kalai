@@ -66,7 +66,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             throws ServletException, IOException, JwtTokenException {
         try {
             String url= request.getRequestURI();
-            logger.info("doFilterInternal URL request# {}", url);
             if(url != null && !isValidUrl(url)){
                 String jwt = parseJwt(request);
                 if (jwt != null && jwtUtils.validateJwtToken(jwt) && jwtUtils.isTokenExpired(jwt)) {

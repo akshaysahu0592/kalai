@@ -1,6 +1,5 @@
 package com.tcit.vms.vms.service;
 import com.tcit.vms.vms.model.Visit;
-import com.tcit.vms.vms.model.VisitAccompany;
 import com.tcit.vms.vms.model.Visitor;
 import com.tcit.vms.vms.repository.StaffRepository;
 
@@ -53,11 +52,11 @@ public class SendMailService {
             String htmlStr= getVisitorHtml(visit,visitor, visitorType);
             helper.setText(htmlStr, true);
             InputStream file = new ByteArrayInputStream(pdfGenerationService.generatePdfFromHtml(htmlStr));
-            log.info("pdf generated for {}", visitor.getEmail());
+            log.info("pdf generated for {}:{}", visitorType, visitor.getEmail());
             FileSystemResource resource = new FileSystemResource(new File("VisitorPass.pdf"));
             helper.addAttachment("VisitorPass.pdf",resource);
             javaMailSender.send(msg);
-            log.info("Visitor email send to visitor :{}", visitor.getEmail());
+            log.info("Email send to {} : {}", visitorType, visitor.getEmail());
         } catch (MessagingException e) {
             log.error("messaging exception occurred for : {},{}", visitor.getEmail(),e.getMessage());
             e.printStackTrace();
