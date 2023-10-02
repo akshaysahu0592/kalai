@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import com.google.gson.Gson;
@@ -13,6 +14,7 @@ import com.google.gson.Gson;
 import com.tcit.vms.vms.model.CryptoGenerationResponse;
 import com.tcit.vms.vms.model.Entity.*;
 import com.tcit.vms.vms.model.Visit;
+import com.tcit.vms.vms.model.Visitor;
 import com.tcit.vms.vms.network.GetDataService;
 import com.tcit.vms.vms.network.RetrofitClientInstance;
 import com.tcit.vms.vms.util.CommonUtils;
@@ -169,7 +171,7 @@ public class CryptoGeneration {
 
         return null;
     }
-    public String generation(Visit visitorDetails) {
+    public void generation(Visitor visitor, LocalDateTime dateOfVisit) {
 
         properties = Utility.getProperties(resourceLoader);
 
@@ -181,25 +183,23 @@ public class CryptoGeneration {
             String url = properties.getProperty("idencodeBaseUrl");
 
             try {
-                Integer refId = generateCryptograph(url, visitorDetails);
-
-                return "Cryptograph Generated";
+                Integer refId = generateCryptograph(url, visitor, dateOfVisit);
+                log.info("Cryptograph Generated for visitor:{}", visitor.getId());
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
         } else {
-            System.out.println("error reading properties file");
+            log.info("error reading properties file for visitor:{}", visitor.getId());
         }
-        return "Failed to generate Cryptograph";
     }
-    private Integer generateCryptograph(String url, Visit visitorDetails)
+    private Integer generateCryptograph(String url, Visitor visitor, LocalDateTime dateOfVisit)
             throws IOException {
         final CryptoGenerationResponse cryptoGenerationResponse = new CryptoGenerationResponse();
         ArrayList<MultipartBody.Part> parts = new ArrayList<>();
 // face image
         //byte[] faceImageBytes = Base64.getDecoder().decode(visitorDetails.getVisitor().getProfPicture());
-        byte[] faceImageBytes=new FileInputStream("C:\\Projects\\VMSMedia\\image\\VISITOR\\"+visitorDetails.getVisitor().getId()+"\\"+visitorDetails.getVisitor().getProfPicture()).readAllBytes();
+        byte[] faceImageBytes=new FileInputStream("C:\\Projects\\VMSMedia\\image\\VISITOR\\"+visitor.getId()+"\\"+visitor.getProfPicture()).readAllBytes();
         if (faceImageBytes.length>0) {
             parts.add(Utility.byteArrayToMultipart("face_image", faceImageBytes, "face.jpg", "image/jpeg"));
         } else {
@@ -207,12 +207,12 @@ public class CryptoGeneration {
         }
 //demog
         MultipartBody.Part demographics = null;
-        String txt = Arrays.asList(visitorDetails.getVisitor().getName(), visitorDetails.getDateOfVisit().toString(), visitorDetails.getVisitor().getEmail(), visitorDetails.getId().toString())
+        String txt = Arrays.asList(visitor.getName(), dateOfVisit.toString(), visitor.getEmail(), visitor.getId().toString())
                 .stream()
                 .collect(Collectors.joining(", "));
         demographics = Utility.byteArrayToMultipart("demog", txt.getBytes(), "demog.txt","application/octet-stream");
         parts.add(demographics);
-        String pipelineJson = new Gson().toJson(getPipeline(visitorDetails));
+        String pipelineJson = new Gson().toJson(getPipeline(dateOfVisit));
 
         MultipartBody.Part pipelinePart = Utility.byteArrayToMultipart("pipeline", pipelineJson.getBytes(),
                 "pipeline.json", "application/json");
@@ -254,10 +254,10 @@ public class CryptoGeneration {
                                 String responseString  = new Gson().toJson(response.body());
 
                                 saveFile(responseString.getBytes(),
-                                        visitorDetails.getId().toString(), "response.json");
+                                        visitor.getId().toString(), "response.json");
 
                                 String path = saveFile(Base64.getDecoder().decode(response.body().image.getBytes()),
-                                        visitorDetails.getVisitor().getId().toString(), visitorDetails.getVisitor().getId().toString()+".png");
+                                        visitor.getId().toString(), visitor.getId().toString()+".png");
 
                                 if(path!=null) {
 
@@ -300,11 +300,11 @@ public class CryptoGeneration {
             throw new RuntimeException(e);
         }
 
-        visitorDetails.getVisitor().setCryptograph(cryptoGenerationResponse.getImage());
+        visitor.setCryptograph(cryptoGenerationResponse.getImage());
 
-        return visitorDetails.getVisitor().getId();
+        return visitor.getId();
     }
-    private Pipeline getPipeline(Visit visitorDetails){
+    private Pipeline getPipeline(LocalDateTime dateOfVisit){
         Pipeline pipeline = new Pipeline();
 
         FaceParams faceParams = new FaceParams(includeFaceTemplate, 0.6f, 1, includeCompressedImage,
@@ -322,7 +322,7 @@ public class CryptoGeneration {
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         // par.expirationDate = sdf.format(c.getTime());
-        Date expDate = CommonUtils.getDateByMinsOrHours(visitorDetails.getDateOfVisit(),
+        Date expDate = CommonUtils.getDateByMinsOrHours(dateOfVisit,
                 2);
 
         par.expirationDate = sdf.format(expDate);

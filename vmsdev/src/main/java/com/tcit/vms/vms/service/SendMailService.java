@@ -36,7 +36,6 @@ public class SendMailService {
     @Autowired
     private ResourceLoader resourceLoader;
     public void sendEmailToVisitor(Visit visit) {
-        log.info("sendEmailToVisitor called!!!");
         this.sendEmailWithHtml(visit, sender,visit.getVisitor());
         if(visit.getAccompanies()!=null && visit.getAccompanies().size()>0)
         {

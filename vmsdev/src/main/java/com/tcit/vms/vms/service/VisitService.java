@@ -255,17 +255,31 @@ public class VisitService {
         }
         return data;
     }
-    public ResponseDto approveOrRejectVisitorBySecurity(SecurityApproveRejectDto securityApproveRejectDto, boolean sendMailToVisitor) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, IOException, InvalidKeyException, BadPaddingException, MessagingException {
+    public ResponseDto approveOrRejectVisitorBySecurity(SecurityApproveRejectDto securityApproveRejectDto, boolean sendMailToVisitor) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, IOException, InvalidKeyException, BadPaddingException, IOException  {
 
         visitRepository.updateApprovedBySecurity(securityApproveRejectDto.getApprovedBySecurity(), securityApproveRejectDto.getVisitId(),securityApproveRejectDto.getReason(),securityApproveRejectDto.getComments(),securityApproveRejectDto.getApprovedBySecurityId());
         Visit visit = visitRepository.findById(securityApproveRejectDto.getVisitId()).orElseThrow();
         if (securityApproveRejectDto.getApprovedBySecurity() == 1 && sendMailToVisitor) {
             if (visit.getVisitor().getCryptograph()== null) {
-                cryptoGeneration.generation(visit);
+                cryptoGeneration.generation(visit.getVisitor(), visit.getDateOfVisit());
                 visitorRepository.save(visit.getVisitor());
-                Request request = getRequest(visit);
-
+                Request request = getRequest(visit.getVisitor());
                 biometricsService.enroll(request);
+            }
+            if(visit.getAccompanies()!=null && visit.getAccompanies().size()>0)
+            {
+                visit.getAccompanies().stream().forEach(e->{
+                    cryptoGeneration.generation(e, visit.getDateOfVisit());
+                    visitorRepository.save(e);
+                    try {
+                        Request request = getRequest(e);
+                        biometricsService.enroll(request);
+                    } catch (IOException ex) {
+                        log.error("IOException in getRequest for Accompany id :{}", e.getId());
+                        throw new RuntimeException(ex);
+                    }
+
+                });
             }
             sendMailService.sendEmailToVisitor(visit);
             return new ResponseDto("SUCCESS", "Visit approved by Security", "");
@@ -280,13 +294,13 @@ public class VisitService {
         return null;
     }
 
-    public Request getRequest( Visit visit) throws IOException {
+    public Request getRequest( Visitor visitor) throws IOException {
         Request request=new Request();
-        request.setTransactionId(visit.getId().toString());
+        request.setTransactionId(visitor.toString());
 
         request.setTransactionSource("VMS Khalifa");
-        request.setUid(visit.getVisitor().getId().toString());
-        String FOLDER_PATH= "C:/Projects/VMSMedia/image/VISITOR/"+visit.getVisitor().getId()+"/"+visit.getVisitor().getProfPicture();
+        request.setUid(visitor.getId().toString());
+        String FOLDER_PATH= "C:/Projects/VMSMedia/image/VISITOR/"+visitor.getId()+"/"+visitor.getProfPicture();
         byte[] file= FileCopyUtils.copyToByteArray(new File(FOLDER_PATH));
         Face face=new Face();
         face.setImage(Base64.getEncoder().encodeToString(file));
