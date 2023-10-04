@@ -393,15 +393,17 @@ public class VisitService {
             dto.setReasonName(visit.getReason().getReasonName());
         dto.setComments(visit.getComments());
         dto.setAccompanyCount(visit.getAccompanyCount());
-        if(dto.getAccompanyDetails() != null && !dto.getAccompanyDetails().isEmpty()) {
-            dto.getAccompanyDetails().stream().forEach(e -> {
-                // VisitRequestCreateDto dto = new VisitRequestCreateDto();
-                dto.setName(e.getName());
-                dto.setMobileNo(e.getMobileNo());
-                dto.setEmail(e.getEmail());
-                dto.setProfPicture(e.getPicture());
-                dto.setEmiratesId(e.getEmiratesId());
-            });
+        if(visit.getAccompanies() != null && !visit.getAccompanies().isEmpty()) {
+            List<VisitorAccompanyDto> dtoList = visit.getAccompanies().stream().map(e -> {
+                VisitorAccompanyDto accompanyDto = new VisitorAccompanyDto();
+                accompanyDto.setName(e.getName());
+                accompanyDto.setMobileNo(e.getMobileNo());
+                accompanyDto.setEmail(e.getEmail());
+                accompanyDto.setPicture(e.getProfPicture());
+                accompanyDto.setEmiratesId(e.getEmiratesId());
+                return accompanyDto;
+            }).collect(Collectors.toList());
+            dto.setAccompanyDetails(dtoList);
         }
 
         return dto;
