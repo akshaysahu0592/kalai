@@ -45,10 +45,8 @@ public class VisitorService {
         return visitorRepository.findById(id).orElseThrow(() -> new RuntimeException("No Visitor found for ID " + id));
     }
     public ResponseDto createVisitor(VisitRequestCreateDto visitRequestDto) {
-
         ResponseDto responseDto = null;
          try {
-
             Visitor visitor = creatingVisitor(visitRequestDto);
              if (isVisitEntryExits(visitor.getId(), visitRequestDto.getDateOfVisit())) {
                  DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -62,7 +60,7 @@ public class VisitorService {
                     dto.setName(e.getName());
                     dto.setMobileNo(e.getMobileNo());
                     dto.setEmail(e.getEmail());
-                    dto.setProfPicture(e.getProfPicture());
+                    dto.setProfPicture(e.getPicture());
                     dto.setEmiratesId(e.getEmiratesId());
                     dto.setVisitorTypeId(visitRequestDto.getVisitorTypeId());
 
@@ -74,8 +72,6 @@ public class VisitorService {
                     }
                 });
             }
-
-
             if (visitRequestDto.getCreatedBy().equals("visitor")) {
                 visitService.sendEmailToDept(visit, visitor);
 
@@ -90,23 +86,19 @@ public class VisitorService {
                 securityApproveRejectDto.setApprovedBySecurity(1);
                 visitService.approveOrRejectVisitorBySecurity(securityApproveRejectDto, true);
             }
-
-            responseDto = new ResponseDto("SUCCESS", "Visitor created ", "");
+           return new ResponseDto("SUCCESS", "Visitor created ", "");
         }
         catch (Exception e) {
             e.printStackTrace();
-           //responseDto = new ResponseDto("Error", "Visitor mobile number already exists", "");
-            throw new  ApplicationValidationException("Exception occurred please check the log");
-        }
-        return responseDto;
+          }
+       return new ResponseDto("ERROR", "Exception occurred please check the log", "");
     }
-    private Visitor creatingVisitor(VisitRequestCreateDto visitRequestDto) throws IOException {
+       private Visitor creatingVisitor(VisitRequestCreateDto visitRequestDto) throws IOException {
         List<Visitor> visitors = visitorRepository.findByMobileNo(visitRequestDto.getMobileNo());
         Visitor visitor = null;
         if (visitors != null && !visitors.isEmpty()) {
             visitor = visitors.stream().filter(e->e.isActive()).findFirst().orElse(null);
         }
-
         VisitorType visitorType = visitorTypeService.getvisitorTypeById(visitRequestDto.getVisitorTypeId());
 
         if (visitor == null) {
@@ -138,10 +130,7 @@ public class VisitorService {
         }
         return visitor;
     }
-
-
     private void createVisitAccompany(Visit visit, Visitor acc) throws IOException {
-
         List<Visitor> accompanies = visit.getAccompanies();
         if(Objects.isNull(accompanies) || accompanies.isEmpty())
             accompanies = new ArrayList<>();
@@ -244,7 +233,7 @@ public class VisitorService {
         String endDate = localDateTime.format(df);
         return visitorRepository.findByVisitingDate(startDate, endDate);
     }
-    public ResponseDto addVisitor(VisitorRequestDto dto) {
+   public ResponseDto addVisitor(VisitorRequestDto dto) {
         List<Visitor> visitors = visitorRepository.findByMobileNo(dto.getMobileNo());
         Visitor visitor = null;
         ResponseDto responseDto=null;
@@ -252,10 +241,7 @@ public class VisitorService {
         if (visitors != null && !visitors.isEmpty()) {
             visitor = visitors.stream().filter(e -> e.isActive()).findFirst().orElse(null);
         }
-
-
         if (visitor == null) {
-
             try {
                 visitor = Visitor.builder()
                         .id(dto.getVisitorId())
@@ -278,21 +264,15 @@ public class VisitorService {
                     dto.setProfPicture((String) responseDto.getData());
                     visitorRepository.save(visitor);
 
-
-                }
-                responseDto = new ResponseDto("SUCCESS", "Visitor Created ", "");
-                // return responseDto;
-            } catch (Exception e) {
+                return new ResponseDto("SUCCESS", "Visitor Created ", "");
+                           }
+            }catch (Exception e) {
                 e.getStackTrace();
-
             }
-
-            return responseDto;
-        }throw new ApplicationValidationException("Mobile Number already exists");
+        } return new ResponseDto("ERROR","Mobile Number already exists","");
+    }
     }
 
-
-}
 
 
 

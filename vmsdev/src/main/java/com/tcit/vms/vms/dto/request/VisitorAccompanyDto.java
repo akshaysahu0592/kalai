@@ -9,12 +9,9 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class VisitorAccompanyDto {
-
     private String name;
     private String mobileNo;
-
-    public String email;
-    private String profPicture;
+    public  String email;
+    private String picture;
     private String emiratesId;
-
 }

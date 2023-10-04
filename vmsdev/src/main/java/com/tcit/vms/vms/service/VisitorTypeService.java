@@ -24,21 +24,17 @@ public class VisitorTypeService {
     public VisitorType createVisitorType(VisitorType visitorType) {
         return visitorTypeRepository.save(visitorType);
     }
-
     public VisitorType updateVisitorType(VisitorType visitorType) {
         return visitorTypeRepository.save(visitorType);
     }
-
     public VisitorType getVisitorTypeById(Integer visitorTypeId)
     {
-
         return  visitorTypeRepository.findById(visitorTypeId).get();
     }
     public VisitorType deleteVisitorType(Integer id) {
         VisitorType visitorType=getVisitorTypeById(id);
         visitorType.setActive(false);
         return visitorTypeRepository.save(visitorType);
-
     }
 }
 

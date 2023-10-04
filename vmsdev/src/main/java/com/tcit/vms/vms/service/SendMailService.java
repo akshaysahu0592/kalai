@@ -49,7 +49,7 @@ public class SendMailService {
             helper.setTo(visitor.getEmail());
             helper.setFrom(from,"Visitor Management System");
             helper.setSubject("Update on your Visitor Request ");
-            String htmlStr= getVisitorHtml(visit,visitor, visitorType);
+            String htmlStr= getVisitorHtml(visit,visitor);
             helper.setText(htmlStr, true);
             InputStream file = new ByteArrayInputStream(pdfGenerationService.generatePdfFromHtml(htmlStr));
             log.info("pdf generated for {}:{}", visitorType, visitor.getEmail());
@@ -66,7 +66,7 @@ public class SendMailService {
             throw new RuntimeException(e);
         }
     }
-    private String getVisitorHtml(Visit visit, Visitor visitor, String visitorType){
+    private String getVisitorHtml(Visit visit, Visitor visitor){
         Resource resource = resourceLoader.getResource("classpath:crypto.html");
 
         try (InputStream inputStream = resource.getInputStream()) {
@@ -75,7 +75,7 @@ public class SendMailService {
             StringBuilder stringBuilder = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
-                stringBuilder.append(replaceVisitorToken(line, visit, visitor, visitorType));
+                stringBuilder.append(replaceVisitorToken(line, visit, visitor));
             }
 
             String htmlContent = stringBuilder.toString();
@@ -85,7 +85,7 @@ public class SendMailService {
         }
         return null;
     }
-    private String replaceVisitorToken(String data, Visit visit, Visitor visitor, String visitorType){
+    private String replaceVisitorToken(String data, Visit visit, Visitor visitor){
         if (data.contains("@@{name}@@")){
             return  data.replace("@@{name}@@", visitor.getName());
         }
@@ -111,9 +111,7 @@ public class SendMailService {
         if (data.contains("@@{accompanies}@@")){
             return  data.replace("@@{accompanies}@@", visit.getAccompanyCount().toString());
         }
-        if (data.contains("@@{visitorType}@@")){
-            return  data.replace("@@{visitorType}@@", visitorType);
-        }
+
         String cryptoImageUrl=imageUrl+"/crypto/"+visitor.getId()+"/"+visitor.getId()+".png";
         if (data.contains("@@{IMAGE_URL}@@")){
             data=data.replace("@@{IMAGE_URL}@@", cryptoImageUrl);

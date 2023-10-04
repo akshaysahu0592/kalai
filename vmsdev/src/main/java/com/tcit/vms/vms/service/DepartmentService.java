@@ -31,9 +31,7 @@ public class DepartmentService {
         throw new UserNotFoundException("Department not found with id "+departmentId);
     }
     public List<Department> getDepartmentList() {
-
             List<Department> departmentList= departmentRepository.findAll();
-
             return departmentList.stream().filter(s-> Objects.nonNull(s.isActive()) && s.isActive()).collect(Collectors.toList());
         }
     public Department createDepartment(Department department) {

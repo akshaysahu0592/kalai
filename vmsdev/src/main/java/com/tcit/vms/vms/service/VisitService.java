@@ -183,7 +183,6 @@ public class VisitService {
         }
         return null;
     }
-
     public ResponseDto sendEmailToSecurity(Visit visit) throws Exception {
         MimeMessage msg = javaMailSender.createMimeMessage();
         List<Staff> securities = staffRepository.findByRoleId(4);
@@ -199,13 +198,9 @@ public class VisitService {
         }
         return new ResponseDto("SUCCESS", "Visit Details sent to Security ", "");
     }
-
-
     private String getNewHtmlToSecurity(Visit visit, Staff staff) {
         Resource resource = resourceLoader.getResource("classpath:approve.html");
-
         try (InputStream inputStream = resource.getInputStream()) {
-
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             StringBuilder stringBuilder = new StringBuilder();
             String line;
@@ -245,7 +240,6 @@ public class VisitService {
         if (data.contains("@@{accompanies}@@")){
             return  data.replace("@@{accompanies}@@", visit.getAccompanyCount().toString());
         }
-
         if (data.contains("@@{url}@@")) {
             String link = "http://vms.tcit.ae/#/approvevisit?id=";
             link = link + EncryptUtil.encrypt(visit.getId().toString()) + "&type=security&securityId=" + EncryptUtil.encrypt(staff.getId().toString()) ;
@@ -254,7 +248,6 @@ public class VisitService {
         return data;
     }
     public ResponseDto approveOrRejectVisitorBySecurity(SecurityApproveRejectDto securityApproveRejectDto, boolean sendMailToVisitor) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, IOException, InvalidKeyException, BadPaddingException, IOException  {
-
         visitRepository.updateApprovedBySecurity(securityApproveRejectDto.getApprovedBySecurity(), securityApproveRejectDto.getVisitId(),securityApproveRejectDto.getReason(),securityApproveRejectDto.getComments(),securityApproveRejectDto.getApprovedBySecurityId());
         Visit visit = visitRepository.findById(securityApproveRejectDto.getVisitId()).orElseThrow();
         if (securityApproveRejectDto.getApprovedBySecurity() == 1 && sendMailToVisitor) {
@@ -280,14 +273,11 @@ public class VisitService {
                         log.error("IOException in getRequest for Accompany id :{}", e.getId());
                         throw new RuntimeException(ex);
                     }
-
                 });
             }
             sendMailService.sendEmailToVisitor(visit);
             return new ResponseDto("SUCCESS", "Visit approved by Security", "");
         }
-
-
         if (securityApproveRejectDto.getApprovedBySecurity() == 2 && sendMailToVisitor) {
             visit.setStatus("Declined");
             sendMailService.sendDeclinedEmailToVisitor(visit);
@@ -299,7 +289,6 @@ public class VisitService {
     public Request getRequest( Visitor visitor) throws IOException {
         Request request=new Request();
         request.setTransactionId(visitor.toString());
-
         request.setTransactionSource("VMS Khalifa");
         request.setUid(visitor.getId().toString());
         String FOLDER_PATH= "C:/Projects/VMSMedia/image/VISITOR/"+visitor.getId()+"/"+visitor.getProfPicture();
@@ -309,10 +298,9 @@ public class VisitService {
         request.setFaceData(face);
         face.setPos("F");
         face.setTemplate(null);
-      face.setQuality(Double.valueOf("0.0"));
+        face.setQuality(Double.valueOf("0.0"));
         return request;
    }
-
     public VisitResponseDto getVisitDetailsByVisitId(Integer id) {
         Optional<Visit> optionalVisit = Optional.ofNullable(visitRepository.findByIdAndIsActive(id, true).orElseThrow(() -> new UserNotFoundException("Visit not found or InActive!!!!!")));
 
@@ -323,7 +311,7 @@ public class VisitService {
             return null;
         }
     }
-    private VisitResponseDto convertDto(Visit visit) {
+    /*private VisitResponseDto convertDto(Visit visit) {
         VisitResponseDto dto = new VisitResponseDto();
         dto.setVisitorId(visit.getVisitor().getId());
         dto.setVisitId(visit.getId());
@@ -351,8 +339,74 @@ public class VisitService {
         dto.setReasonName(visit.getReason().getReasonName());
         dto.setComments(visit.getComments());
         dto.setAccompanyCount(visit.getAccompanyCount());
+
+
+
+            if(dto.getAccompanyDetails() != null && !dto.getAccompanyDetails().isEmpty()) {
+                dto.setAccompanyDetails(visit.getAccompanies().stream().forEach(e -> {
+                    // VisitRequestCreateDto dto = new VisitRequestCreateDto();
+                    dto.setName(e.getName());
+                    dto.setMobileNo(e.getMobileNo());
+                    dto.setEmail(e.getEmail());
+                    dto.setProfPicture(e.getProfPicture());
+                    dto.setEmiratesId(e.getEmiratesId());
+                });
+            }
         return dto;
     }
+*/
+   /* public VisitResponseDto getVisitDetailsByVisitId(Integer id) {
+        Optional<Visit> optionalVisit = Optional.ofNullable(visitRepository.findByIdAndIsActive(id, true).orElseThrow(() -> new UserNotFoundException("Visit not found or InActive!!!!!")));
+
+        if (optionalVisit.isPresent()) {
+            Visit visit = optionalVisit.get();
+            return convertDto(visit, VisitAccompanyDto.builder().build());
+        } else {
+            return null;
+        }
+    }*/
+    private VisitResponseDto convertDto(Visit visit) {
+        VisitResponseDto dto = new VisitResponseDto();
+        dto.setVisitorId(visit.getVisitor().getId());
+        dto.setVisitId(visit.getId());
+        dto.setName(visit.getVisitor().getName());
+        dto.setEmiratesId(visit.getVisitor().getEmiratesId());
+        dto.setEmail(visit.getVisitor().getEmail());
+        dto.setMobileNo(visit.getVisitor().getMobileNo());
+        dto.setVisitorTypeId(visit.getVisitor().getVisitorType().getId());
+        dto.setVisitorType(visit.getVisitor().getVisitorType().getName());
+        dto.setProfPicture(visit.getVisitor().getProfPicture());
+        dto.setDateOfVisit(visit.getDateOfVisit());
+        dto.setDuration(visit.getDuration());
+        if(visit.getStaff()!=null)
+            dto.setHostId(visit.getStaff().getId());
+        if(visit.getStaff()!=null)
+            dto.setHostName(visit.getStaff().getStaffName());
+        dto.setDeptId(visit.getDepartment().getId());
+        dto.setDepartmentName(visit.getDepartment().getDeptName());
+        dto.setCampusId(visit.getCampus().getId());
+        dto.setCampusName(visit.getCampus().getCampusName());
+        dto.setStatus(visit.getStatus());
+        dto.setApprovedByHost(visit.getApprovedByHost());
+        dto.setApprovedBySecurity(visit.getApprovedBySecurity());
+        if(visit.getReason()!=null)
+            dto.setReasonName(visit.getReason().getReasonName());
+        dto.setComments(visit.getComments());
+        dto.setAccompanyCount(visit.getAccompanyCount());
+        if(dto.getAccompanyDetails() != null && !dto.getAccompanyDetails().isEmpty()) {
+            dto.getAccompanyDetails().stream().forEach(e -> {
+                // VisitRequestCreateDto dto = new VisitRequestCreateDto();
+                dto.setName(e.getName());
+                dto.setMobileNo(e.getMobileNo());
+                dto.setEmail(e.getEmail());
+                dto.setProfPicture(e.getPicture());
+                dto.setEmiratesId(e.getEmiratesId());
+            });
+        }
+
+        return dto;
+    }
+
     public VisitResponseDto GetVisitByVisitId(VisitByVistIdDto visitByVistIdDto) throws Exception {
         String decryptId = EncryptUtil.decrypt(visitByVistIdDto.getId());
 
@@ -365,7 +419,18 @@ public class VisitService {
             return null;
         }
     }
+  /* public VisitResponseDto GetVisitByVisitId(VisitByVistIdDto visitByVistIdDto) throws Exception {
+       String decryptId = EncryptUtil.decrypt(visitByVistIdDto.getId());
 
+       Optional<Visit> optionalVisit = Optional.ofNullable(visitRepository.findByIdAndIsActive(Integer.valueOf(decryptId), true)).orElseThrow(() -> new UserNotFoundException("Visit not found or InActive!!!!!"));
+
+       if (optionalVisit.isPresent()) {
+           Visit visit = optionalVisit.get();
+           return convertDto(visit, VisitAccompanyDto.builder().build());
+       } else {
+           return null;
+       }
+   }*/
     public List<ResponseVisitsListSecurityApprovalDto> getAllVisitsForSecurityApproval() {
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = LocalDateTime.now().plusYears(1);
@@ -470,7 +535,6 @@ public class VisitService {
         dto.setAccompanyCount(visit.getAccompanyCount());
         return dto;
     }
-
   public List<VisitStaffResponseDto> GetAllVisitsHistory(SearchVisitRequestHistoryDto requestDto) {
       visitRepository.updateStatus(LocalDateTime.now().minusMinutes(10));
        LocalDateTime startDate = null;

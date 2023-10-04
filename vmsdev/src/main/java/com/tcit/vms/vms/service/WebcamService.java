@@ -17,11 +17,8 @@ public class WebcamService {
     public String captureImage(Integer visitorId) throws IOException {
         Webcam webcam = Webcam.getDefault();
         webcam.open();
-
         BufferedImage image = webcam.getImage();
-
         ImageIO.write(image, ImageUtils.FORMAT_JPG, new File(visitorId+"selfie.jpg"));
-
         webcam.close();
         InputStream is= new FileInputStream(new File(visitorId+"selfie.jpg"));
         return  Base64.getEncoder().encodeToString(is.readAllBytes());

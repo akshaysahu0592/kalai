@@ -25,11 +25,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
            throw new UsernameNotFoundException("User Not Found with Email : "+email);
         }
         else{
-
-
         Staff staff=staffDb.stream().filter(e->e.isActive()).findFirst().get();
-
-
         return UserDetailsImpl.build(staff);
     }
     }

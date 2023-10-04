@@ -29,7 +29,7 @@ public class Staff implements Serializable {
     @Pattern(regexp = "^\\+971\\d{9}$", message = "Invalid UAE mobile number format. It should start with +971 followed by 9 digits.")
     @Column(name="mobileno")
     private String mobileNo;
-    @Column (unique = true)
+    @Column (unique = false)
     @Email(message = "Email must follow the formatter: ***@***")
     private String email;
     @Column(name="profpicture")

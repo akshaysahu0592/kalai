@@ -73,8 +73,7 @@ public class VisitorController {
     }
     @PostMapping("/AddVisitor")
     public ResponseDto addVisitor(@RequestBody VisitorRequestDto dto) throws IOException {
-        return visitorService.addVisitor(dto);
-          //new ResponseDto("","Visitor Created Successfully","");
+          return   visitorService.addVisitor(dto);
     }
     @GetMapping("/getImageById/{id}")
     public ResponseEntity<?> getPicturePath(@PathVariable Integer id) throws IOException {

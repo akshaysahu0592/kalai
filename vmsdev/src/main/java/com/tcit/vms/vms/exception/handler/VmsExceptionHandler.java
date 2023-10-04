@@ -18,7 +18,6 @@ public class VmsExceptionHandler {
     @ExceptionHandler(value = {
             VisitorNotFoundException.class,
             UserNotFoundException.class
-
     })
     protected ResponseEntity<ResponseDto> handle(RuntimeException runtimeException)
     {
@@ -35,7 +34,6 @@ public class VmsExceptionHandler {
         ResponseDto responseDto= new ResponseDto("",e.getMessage(), "");
         e.printStackTrace();
         return ResponseEntity.internalServerError().body(responseDto);
-
     }
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value={

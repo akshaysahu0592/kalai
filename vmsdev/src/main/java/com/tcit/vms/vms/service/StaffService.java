@@ -7,6 +7,8 @@ import com.tcit.vms.vms.exception.UserNotFoundException;
 import com.tcit.vms.vms.model.Department;
 import com.tcit.vms.vms.model.Staff;
 
+import com.tcit.vms.vms.model.Visitor;
+import com.tcit.vms.vms.model.VisitorType;
 import com.tcit.vms.vms.repository.StaffRepository;
 
 import com.tcit.vms.vms.util.EncryptUtil;
@@ -71,14 +73,7 @@ public class StaffService {
     public Optional<Staff> getStaffByIdList(Integer id) {
         return staffRepository.findById(id);
     }
-   /* public Staff getStaffById(Integer id) {
-        return staffRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Staff not found!!!!!"));
-    }*/
-  /* public Staff getStaffById(Integer id) {
-
-       return staffRepository.findById(id).get();
-   }*/
-   public Staff getStaffById(Integer id) {
+      public Staff getStaffById(Integer id) {
        Optional<Staff> staff=staffRepository.findById(id);
        if(staff.isPresent())
        {
@@ -92,7 +87,7 @@ public class StaffService {
     public Staff findByIdAndIsActive(Integer id) {
         return staffRepository.findByIdAndIsActive(id, true).orElseThrow(() -> new UserNotFoundException("Staff not found or InActive!!!!!"));
     }
-    public ResponseDto createStaff(StaffRequestDto staffRequestDto) throws IOException {
+    /*public ResponseDto createStaff(StaffRequestDto staffRequestDto) throws IOException {
         ResponseDto responseDto=null;
         Staff staff = null;
         try {
@@ -130,7 +125,53 @@ public class StaffService {
         }
         return responseDto;
     }
+*/
+    public ResponseDto createStaff(StaffRequestDto staffRequestDto) throws IOException {
+        List<Staff> staffs = staffRepository.findByEmail(staffRequestDto.getEmail());
+        Staff staff=null;
+        ResponseDto responseDto=null;
+        if (staffs != null && !staffs.isEmpty()) {
+            staff = staffs.stream().filter(e->e.isActive()).findFirst().orElse(null);
+        }
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        Department dept = departmentService.getDepartmentById(staffRequestDto.getDepartmentId());
+        if (staff == null) {
+        try {
+            log.info("StaffService request # {}", staffRequestDto);
 
+          staff = new Staff();
+            staff.setId(staffRequestDto.getId());
+            staff.setStaffName(staffRequestDto.getStaffName());
+            staff.setMobileNo(staffRequestDto.getMobileNo());
+            staff.setEmail(staffRequestDto.getEmail());
+            staff.setPassword(passwordEncoder.encode(staffRequestDto.getPassword()));
+            staff.setDepartment(dept);
+            staff.setDesignation(staffRequestDto.getDesignation());
+            staff.setRole(roleService.getRoleById(staffRequestDto.getRoleId()));
+            staff.setCreatedDate(LocalDateTime.now());
+            staff.setActive(true);
+            staff = staffRepository.save(staff);
+
+            if (staffRequestDto.getProfPicture() != null && !staffRequestDto.getProfPicture().isEmpty()) {
+
+                log.info("Upload Picture for StaffId# {}", staff.getId());
+                responseDto = storageService.uploadImage(staffRequestDto.getProfPicture(),
+                        staff.getId(),
+                        "jpg",
+                        "STAFF");
+                staff.setProfPicture((String) responseDto.getData());
+                staffRepository.save(staff);
+            }
+          else {
+                staff.setProfPicture(null);
+           }
+            return new ResponseDto("SUCCESS", "Staff Added Successfully", staff.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        }
+        return  new ResponseDto("Error", "Staff email already exists","" );
+    }
     public ResponseDto updateStaff(StaffReqUpdateDto staffReqUpdateDto) throws IOException {
         log.info("StaffService request # {}", staffReqUpdateDto);
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -149,8 +190,6 @@ public class StaffService {
             staff.setPassword(passwordEncoder.encode(staffReqUpdateDto.getPassword()));
             staff.setDepartment(departmentService.getDepartmentById(staffReqUpdateDto.getDepartmentId()));
             staff.setRole(roleService.getRoleById(staffReqUpdateDto.getRoleId()));
-            //if (staffReqUpdateDto.getDesignation().toLowerCase().contains("Admin") || staffReqUpdateDto.getDesignation().toLowerCase().contains("Staff"))
-
             staff.setDesignation(staffReqUpdateDto.getDesignation());
 
             staff = staffRepository.save(staff);
@@ -168,8 +207,7 @@ public class StaffService {
         ResponseDto responseDto;
         try{
         Staff staff = staffRepository.findById(dto.getId()).orElse(null);
-       // if (staff.getRole().getId(4) == 1) {
-            if (staff.getRole().getId() == 1) {
+               if (staff.getRole().getId() == 1) {
             throw new UserNotFoundException("Updation not allowed");
         }
         if (staff == null) {
@@ -255,7 +293,6 @@ public class StaffService {
            return new ResponseDto("Error", "Reset password url is expired", "");
        }
     }
-
     @Autowired
     private ResourceLoader resourceLoader;
     private String getHtml(String email,String link){

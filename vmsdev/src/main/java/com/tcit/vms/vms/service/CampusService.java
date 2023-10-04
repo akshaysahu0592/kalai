@@ -41,7 +41,6 @@ public class CampusService {
         campus.setActive(false);
         return campusRepository.save(campus);
     }
-
 }
 
 

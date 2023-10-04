@@ -21,7 +21,7 @@ public class VisitRequestCreateDto {
     private String profPicture;
     private String cryptograph;
     private String emiratesId;
-   // @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Dubai")
+    // @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Dubai")
     private LocalDateTime dateOfVisit;
     private String duration;
 
