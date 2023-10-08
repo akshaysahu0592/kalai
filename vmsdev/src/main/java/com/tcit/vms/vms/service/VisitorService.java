@@ -52,7 +52,6 @@ public class VisitorService {
                  DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
                  throw new ApplicationValidationException(" Visiting request already available for " + df.format(visitRequestDto.getDateOfVisit()));
              }
-
              Visit visit = visitService.createVisit(visitRequestDto, visitor);
             if ((visitRequestDto.getCreatedBy().equals("host") || visitRequestDto.getCreatedBy().equals("security")) && visitRequestDto.getAccompanyDetails() != null && !visitRequestDto.getAccompanyDetails().isEmpty()) {
                 visitRequestDto.getAccompanyDetails().stream().forEach(e -> {
@@ -63,7 +62,6 @@ public class VisitorService {
                     dto.setProfPicture(e.getPicture());
                     dto.setEmiratesId(e.getEmiratesId());
                     dto.setVisitorTypeId(visitRequestDto.getVisitorTypeId());
-
                     try {
                         Visitor acc = creatingVisitor(dto);
                         createVisitAccompany(visit, acc);
@@ -86,12 +84,15 @@ public class VisitorService {
                 securityApproveRejectDto.setApprovedBySecurity(1);
                 visitService.approveOrRejectVisitorBySecurity(securityApproveRejectDto, true);
             }
-           return new ResponseDto("SUCCESS", "Visitor created ", "");
+           //return new ResponseDto("SUCCESS", "Visitor created ", "");
+             responseDto=new ResponseDto("SUCCESS", "Visitor created ", "");
         }
         catch (Exception e) {
             e.printStackTrace();
+            responseDto=new ResponseDto("ERROR", "Exception occurred please check the log", "");
           }
-       return new ResponseDto("ERROR", "Exception occurred please check the log", "");
+       //return new ResponseDto("ERROR", "Exception occurred please check the log", "");
+        return responseDto;
     }
        private Visitor creatingVisitor(VisitRequestCreateDto visitRequestDto) throws IOException {
         List<Visitor> visitors = visitorRepository.findByMobileNo(visitRequestDto.getMobileNo());
@@ -158,7 +159,6 @@ public class VisitorService {
             visitor.setCryptograph(visitorReqUpdateDto.getCryptograph());
             visitor.setEmiratesId(visitorReqUpdateDto.getEmiratesId());
             visitorRepository.save(visitor);
-
             if (visitorReqUpdateDto.getProfPicture() != null && !visitorReqUpdateDto.getProfPicture().isEmpty()) {
                 log.info("Upload Picture for VisitorId# {}", visitor.getId());
                 responseDto = storageService.uploadImage(visitorReqUpdateDto.getProfPicture(),

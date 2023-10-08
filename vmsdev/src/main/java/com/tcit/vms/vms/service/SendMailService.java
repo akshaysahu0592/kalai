@@ -66,18 +66,42 @@ public class SendMailService {
             throw new RuntimeException(e);
         }
     }
+
+    /*public void sendEmailWithHtml(Visit visit, String from,Visitor visitor, String visitorType) {
+        MimeMessage msg = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = null;
+        try {
+            helper = new MimeMessageHelper(msg, true);
+            helper.setTo("peer@technocit.com");
+            helper.setFrom(from,"Visitor Management System");
+            helper.setSubject("Update on your Visitor Request ");
+            String htmlStr= getVisitorHtml(visit,visitor);
+            helper.setText(htmlStr, true);
+            InputStream file = new ByteArrayInputStream(pdfGenerationService.generatePdfFromHtml(htmlStr));
+            log.info("pdf generated for {}:{}", visitorType, visitor.getEmail());
+            FileSystemResource resource = new FileSystemResource(new File("VisitorPass.pdf"));
+            helper.addAttachment("VisitorPass.pdf",resource);
+            javaMailSender.send(msg);
+            log.info("Email send to {} : {}", visitorType, visitor.getEmail());
+        } catch (MessagingException e) {
+            log.error("messaging exception occurred for : {},{}", visitor.getEmail(),e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }  catch (Exception e) {
+            log.error(" exception occurred for : {},{}", visitor.getEmail(),e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }*/
+
     private String getVisitorHtml(Visit visit, Visitor visitor){
         Resource resource = resourceLoader.getResource("classpath:crypto.html");
-
         try (InputStream inputStream = resource.getInputStream()) {
-
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             StringBuilder stringBuilder = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
                 stringBuilder.append(replaceVisitorToken(line, visit, visitor));
             }
-
             String htmlContent = stringBuilder.toString();
             return htmlContent;
         } catch (IOException e) {

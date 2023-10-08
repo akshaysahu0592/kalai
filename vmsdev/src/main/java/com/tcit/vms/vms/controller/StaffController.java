@@ -170,7 +170,6 @@ public class StaffController {
     }
     @PutMapping("/reset-password")
     public ResponseDto resetPassword(@RequestBody ResetPasswordDto resetPasswordDto) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException, ClassNotFoundException, MessagingException {
-
         return staffService.resetPassword(resetPasswordDto);
     }
 }

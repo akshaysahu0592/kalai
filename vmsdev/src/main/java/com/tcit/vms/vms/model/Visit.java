@@ -6,7 +6,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -17,7 +16,6 @@ import java.util.List;
 @JsonIgnoreProperties
 public class Visit implements Serializable {
     private static final long serialVersionUID=1L;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
@@ -34,7 +32,6 @@ public class Visit implements Serializable {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "departmentid", referencedColumnName = "id")
     private Department department;
-
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "staffid", referencedColumnName = "id")
     private Staff staff;

@@ -37,6 +37,7 @@ public class VisitResponseDto {
    private String reasonName;
    private String comments;
    private Integer accompanyCount;
+   private String agenda;
    private List<VisitorAccompanyDto> accompanyDetails;
 
 

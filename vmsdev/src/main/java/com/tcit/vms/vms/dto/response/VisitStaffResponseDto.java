@@ -1,11 +1,13 @@
 package com.tcit.vms.vms.dto.response;
 
+import com.tcit.vms.vms.dto.request.VisitorAccompanyDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -39,6 +41,8 @@ public class VisitStaffResponseDto {
     private String reasonName;
     private String comments;
     private Integer accompanyCount;
+    private String agenda;
+    private List<VisitorAccompanyDto> accompanyDetails;
 }
 
 /*

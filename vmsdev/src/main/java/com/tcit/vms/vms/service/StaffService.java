@@ -171,7 +171,7 @@ public class StaffService {
         }
         }
         return  new ResponseDto("Error", "Staff email already exists","" );
-    }
+    }/*
     public ResponseDto updateStaff(StaffReqUpdateDto staffReqUpdateDto) throws IOException {
         log.info("StaffService request # {}", staffReqUpdateDto);
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -200,6 +200,48 @@ public class StaffService {
         e.printStackTrace();
         responseDto= new ResponseDto("Error", "Staff email already exists","" );
     }
+        return responseDto;
+    }*/
+
+    public ResponseDto updateStaff(StaffReqUpdateDto staffReqUpdateDto) throws IOException {
+        log.info("StaffService request # {}", staffReqUpdateDto);
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        ResponseDto responseDto;
+
+        try {
+            Staff staff = staffRepository.findById(staffReqUpdateDto.getId()).orElse(null);
+            if (staff.getRole().getId() == 1) {
+                throw new UserNotFoundException("Updation not allowed");
+            }
+            if (staff == null) {
+                throw new UserNotFoundException("Staff Not Found with Id " + staffReqUpdateDto.getId());
+            }
+            List<Staff> staffs = staffRepository.findByEmail(staffReqUpdateDto.getEmail());
+            Staff staff1 = null;
+            if (staffs != null && !staffs.isEmpty()) {
+                staff1 = staffs.stream().filter(e->e.isActive()).findFirst().orElse(null);
+            }
+            if(staff1!=null && staff1.getEmail().equalsIgnoreCase(staffReqUpdateDto.getEmail())){
+                throw new ApplicationValidationException("Email update not allowed");
+            }
+            staff.setStaffName(staffReqUpdateDto.getStaffName());
+            staff.setEmail(staffReqUpdateDto.getEmail());
+            staff.setMobileNo(staffReqUpdateDto.getMobileNo());
+            staff.setPassword(passwordEncoder.encode(staffReqUpdateDto.getPassword()));
+            staff.setDepartment(departmentService.getDepartmentById(staffReqUpdateDto.getDepartmentId()));
+            staff.setRole(roleService.getRoleById(staffReqUpdateDto.getRoleId()));
+            //if (staffReqUpdateDto.getDesignation().toLowerCase().contains("Admin") || staffReqUpdateDto.getDesignation().toLowerCase().contains("Staff"))
+
+            staff.setDesignation(staffReqUpdateDto.getDesignation());
+
+            staff = staffRepository.save(staff);
+
+            responseDto= new ResponseDto("SUCCESS", "Staff Updated Successfully", staff.getId());
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            responseDto= new ResponseDto("Error", "Staff email already exists","" );
+        }
         return responseDto;
     }
     public ResponseDto UpdateStaffProfile(StaffReqUpdateProfileDto dto) throws IOException {

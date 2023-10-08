@@ -46,6 +46,4 @@ public class Visitor implements Serializable {
     private LocalDateTime createdDate;
     @Column(name="isactive")
     private boolean isActive=true;
-
-
 }

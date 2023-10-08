@@ -311,60 +311,6 @@ public class VisitService {
             return null;
         }
     }
-    /*private VisitResponseDto convertDto(Visit visit) {
-        VisitResponseDto dto = new VisitResponseDto();
-        dto.setVisitorId(visit.getVisitor().getId());
-        dto.setVisitId(visit.getId());
-        dto.setName(visit.getVisitor().getName());
-        dto.setEmiratesId(visit.getVisitor().getEmiratesId());
-        dto.setEmail(visit.getVisitor().getEmail());
-        dto.setMobileNo(visit.getVisitor().getMobileNo());
-        dto.setVisitorTypeId(visit.getVisitor().getVisitorType().getId());
-        dto.setVisitorType(visit.getVisitor().getVisitorType().getName());
-        dto.setProfPicture(visit.getVisitor().getProfPicture());
-        dto.setDateOfVisit(visit.getDateOfVisit());
-        dto.setDuration(visit.getDuration());
-        if(visit.getStaff()!=null)
-        dto.setHostId(visit.getStaff().getId());
-        if(visit.getStaff()!=null)
-        dto.setHostName(visit.getStaff().getStaffName());
-        dto.setDeptId(visit.getDepartment().getId());
-        dto.setDepartmentName(visit.getDepartment().getDeptName());
-        dto.setCampusId(visit.getCampus().getId());
-        dto.setCampusName(visit.getCampus().getCampusName());
-        dto.setStatus(visit.getStatus());
-        dto.setApprovedByHost(visit.getApprovedByHost());
-        dto.setApprovedBySecurity(visit.getApprovedBySecurity());
-        if(visit.getReason()!=null)
-        dto.setReasonName(visit.getReason().getReasonName());
-        dto.setComments(visit.getComments());
-        dto.setAccompanyCount(visit.getAccompanyCount());
-
-
-
-            if(dto.getAccompanyDetails() != null && !dto.getAccompanyDetails().isEmpty()) {
-                dto.setAccompanyDetails(visit.getAccompanies().stream().forEach(e -> {
-                    // VisitRequestCreateDto dto = new VisitRequestCreateDto();
-                    dto.setName(e.getName());
-                    dto.setMobileNo(e.getMobileNo());
-                    dto.setEmail(e.getEmail());
-                    dto.setProfPicture(e.getProfPicture());
-                    dto.setEmiratesId(e.getEmiratesId());
-                });
-            }
-        return dto;
-    }
-*/
-   /* public VisitResponseDto getVisitDetailsByVisitId(Integer id) {
-        Optional<Visit> optionalVisit = Optional.ofNullable(visitRepository.findByIdAndIsActive(id, true).orElseThrow(() -> new UserNotFoundException("Visit not found or InActive!!!!!")));
-
-        if (optionalVisit.isPresent()) {
-            Visit visit = optionalVisit.get();
-            return convertDto(visit, VisitAccompanyDto.builder().build());
-        } else {
-            return null;
-        }
-    }*/
     private VisitResponseDto convertDto(Visit visit) {
         VisitResponseDto dto = new VisitResponseDto();
         dto.setVisitorId(visit.getVisitor().getId());
@@ -390,12 +336,14 @@ public class VisitService {
         dto.setApprovedByHost(visit.getApprovedByHost());
         dto.setApprovedBySecurity(visit.getApprovedBySecurity());
         if(visit.getReason()!=null)
-            dto.setReasonName(visit.getReason().getReasonName());
+        dto.setReasonName(visit.getReason().getReasonName());
         dto.setComments(visit.getComments());
         dto.setAccompanyCount(visit.getAccompanyCount());
+        dto.setAgenda(visit.getAgenda());
         if(visit.getAccompanies() != null && !visit.getAccompanies().isEmpty()) {
             List<VisitorAccompanyDto> dtoList = visit.getAccompanies().stream().map(e -> {
                 VisitorAccompanyDto accompanyDto = new VisitorAccompanyDto();
+                accompanyDto.setVisitorId(e.getId());
                 accompanyDto.setName(e.getName());
                 accompanyDto.setMobileNo(e.getMobileNo());
                 accompanyDto.setEmail(e.getEmail());
@@ -405,15 +353,11 @@ public class VisitService {
             }).collect(Collectors.toList());
             dto.setAccompanyDetails(dtoList);
         }
-
         return dto;
     }
-
     public VisitResponseDto GetVisitByVisitId(VisitByVistIdDto visitByVistIdDto) throws Exception {
         String decryptId = EncryptUtil.decrypt(visitByVistIdDto.getId());
-
         Optional<Visit> optionalVisit = Optional.ofNullable(visitRepository.findByIdAndIsActive(Integer.valueOf(decryptId), true)).orElseThrow(() -> new UserNotFoundException("Visit not found or InActive!!!!!"));
-
         if (optionalVisit.isPresent()) {
             Visit visit = optionalVisit.get();
             return convertDto(visit);
@@ -421,19 +365,7 @@ public class VisitService {
             return null;
         }
     }
-  /* public VisitResponseDto GetVisitByVisitId(VisitByVistIdDto visitByVistIdDto) throws Exception {
-       String decryptId = EncryptUtil.decrypt(visitByVistIdDto.getId());
-
-       Optional<Visit> optionalVisit = Optional.ofNullable(visitRepository.findByIdAndIsActive(Integer.valueOf(decryptId), true)).orElseThrow(() -> new UserNotFoundException("Visit not found or InActive!!!!!"));
-
-       if (optionalVisit.isPresent()) {
-           Visit visit = optionalVisit.get();
-           return convertDto(visit, VisitAccompanyDto.builder().build());
-       } else {
-           return null;
-       }
-   }*/
-    public List<ResponseVisitsListSecurityApprovalDto> getAllVisitsForSecurityApproval() {
+ public List<ResponseVisitsListSecurityApprovalDto> getAllVisitsForSecurityApproval() {
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = LocalDateTime.now().plusYears(1);
         String status = "Pending";
@@ -466,8 +398,23 @@ public class VisitService {
         dto.setApprovedBySecurty(visit.getApprovedBySecurity());
         dto.setStatus("Pending");
         dto.setAccompanyCount(visit.getAccompanyCount());
+        dto.setAgenda(visit.getAgenda());
+        if(visit.getAccompanies() != null && !visit.getAccompanies().isEmpty()) {
+            List<VisitorAccompanyDto> dtoList = visit.getAccompanies().stream().map(e -> {
+                VisitorAccompanyDto accompanyDto = new VisitorAccompanyDto();
+                accompanyDto.setVisitorId(e.getId());
+                accompanyDto.setName(e.getName());
+                accompanyDto.setMobileNo(e.getMobileNo());
+                accompanyDto.setEmail(e.getEmail());
+                accompanyDto.setPicture(e.getProfPicture());
+                accompanyDto.setEmiratesId(e.getEmiratesId());
+                return accompanyDto;
+            }).collect(Collectors.toList());
+            dto.setAccompanyDetails(dtoList);
+        }
         return dto;
     }
+
     public List<ResponseVisitsListTabDto> GetAllVisitsForTab() {
 
         LocalDateTime startDate = LocalDateTime.now().with(LocalTime.now().minusMinutes(30));
@@ -527,10 +474,10 @@ public class VisitService {
         dto.setVisitId(visit.getId());
         dto.setName(visit.getVisitor().getName());
         dto.setMobileNo(visit.getVisitor().getMobileNo());
-        /*if(visit.getStaff()!=null)
+        if(visit.getStaff()!=null)
         dto.setHostId(visit.getStaff().getId());
         if(visit.getStaff()!=null)
-        dto.setHostName(visit.getStaff().getStaffName());*/
+        dto.setHostName(visit.getStaff().getStaffName());
         dto.setDateOfVisit(visit.getDateOfVisit());
         dto.setStatus(visit.getStatus());
         dto.setDuration(visit.getDuration());
@@ -707,6 +654,20 @@ public class VisitService {
         dto.setReasonName(visit.getReason().getReasonName());
         dto.setComments(visit.getComments());
         dto.setAccompanyCount(visit.getAccompanyCount());
+        dto.setAgenda(visit.getAgenda());
+        if(visit.getAccompanies() != null && !visit.getAccompanies().isEmpty()) {
+            List<VisitorAccompanyDto> dtoList = visit.getAccompanies().stream().map(e -> {
+                VisitorAccompanyDto accompanyDto = new VisitorAccompanyDto();
+                accompanyDto.setVisitorId(e.getId());
+                accompanyDto.setName(e.getName());
+                accompanyDto.setMobileNo(e.getMobileNo());
+                accompanyDto.setEmail(e.getEmail());
+                accompanyDto.setPicture(e.getProfPicture());
+                accompanyDto.setEmiratesId(e.getEmiratesId());
+                return accompanyDto;
+            }).collect(Collectors.toList());
+            dto.setAccompanyDetails(dtoList);
+        }
         return dto;
     }
     private VisitResponseDto convertDtoList(Visit visit) {

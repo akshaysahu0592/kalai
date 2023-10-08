@@ -1,11 +1,14 @@
 package com.tcit.vms.vms.dto.response;
 
+import com.tcit.vms.vms.dto.request.VisitorAccompanyDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -15,7 +18,6 @@ public class ResponseVisitsListSecurityApprovalDto {
 
     private Integer visitorId;
     private Integer visitId;
-
     private String name;
     private String emiratesId;
     private String email;
@@ -23,7 +25,6 @@ public class ResponseVisitsListSecurityApprovalDto {
     private Integer visitorTypeId;
     private String visitorType;
     private String profPicture;
-
     private LocalDateTime dateOfVisit;
     private String duration;
     private Integer hostId;
@@ -36,7 +37,8 @@ public class ResponseVisitsListSecurityApprovalDto {
     private Integer approvedBySecurty;
     private String status;
     private Integer accompanyCount;
-
+    private String agenda;
+    private List<VisitorAccompanyDto> accompanyDetails;
 }
 
    /* public ResponseVisitsListDto(Integer id, String name, String mobileNo, String staffName, LocalDateTime dateOfVisit, String duration) {
