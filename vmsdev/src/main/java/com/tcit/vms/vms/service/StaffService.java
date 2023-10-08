@@ -87,45 +87,7 @@ public class StaffService {
     public Staff findByIdAndIsActive(Integer id) {
         return staffRepository.findByIdAndIsActive(id, true).orElseThrow(() -> new UserNotFoundException("Staff not found or InActive!!!!!"));
     }
-    /*public ResponseDto createStaff(StaffRequestDto staffRequestDto) throws IOException {
-        ResponseDto responseDto=null;
-        Staff staff = null;
-        try {
-            log.info("StaffService request # {}", staffRequestDto);
-            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            Department dept=departmentService.getDepartmentById(staffRequestDto.getDepartmentId());
-            staff = new Staff();
-            staff.setId(staffRequestDto.getId());
-            staff.setStaffName(staffRequestDto.getStaffName());
-            staff.setMobileNo(staffRequestDto.getMobileNo());
-            staff.setEmail(staffRequestDto.getEmail());
-            staff.setPassword(passwordEncoder.encode(staffRequestDto.getPassword()));
-            staff.setDepartment(dept);
-            staff.setDesignation(staffRequestDto.getDesignation());
-            staff.setRole(roleService.getRoleById(staffRequestDto.getRoleId()));
-            staff.setCreatedDate(LocalDateTime.now());
-            staff.setActive(true);
-            staff=staffRepository.save(staff);
-            if (staffRequestDto.getProfPicture() != null && !staffRequestDto.getProfPicture().isEmpty()) {
 
-                log.info("Upload Picture for StaffId# {}", staff.getId());
-                responseDto = storageService.uploadImage(staffRequestDto.getProfPicture(),
-                        staff.getId(),
-                       "jpg" ,
-                        "STAFF");
-                staff.setProfPicture((String) responseDto.getData());
-            }
-            else {
-                staff.setProfPicture(null);
-            }
-            responseDto= new ResponseDto("SUCCESS", "Staff Added Successfully", staff.getId());
-        } catch (Exception e) {
-            e.printStackTrace();
-            responseDto= new ResponseDto("Error", "Staff email already exists","" );
-        }
-        return responseDto;
-    }
-*/
     public ResponseDto createStaff(StaffRequestDto staffRequestDto) throws IOException {
         List<Staff> staffs = staffRepository.findByEmail(staffRequestDto.getEmail());
         Staff staff=null;
@@ -171,37 +133,7 @@ public class StaffService {
         }
         }
         return  new ResponseDto("Error", "Staff email already exists","" );
-    }/*
-    public ResponseDto updateStaff(StaffReqUpdateDto staffReqUpdateDto) throws IOException {
-        log.info("StaffService request # {}", staffReqUpdateDto);
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        ResponseDto responseDto;
-        try {
-            Staff staff = staffRepository.findById(staffReqUpdateDto.getId()).orElse(null);
-            if (staff.getRole().getId() == 1) {
-                throw new UserNotFoundException("Updation not allowed");
-            }
-            if (staff == null) {
-                throw new UserNotFoundException("Staff Not Found with Id " + staffReqUpdateDto.getId());
-            }
-            staff.setStaffName(staffReqUpdateDto.getStaffName());
-            staff.setEmail(staffReqUpdateDto.getEmail());
-            staff.setMobileNo(staffReqUpdateDto.getMobileNo());
-            staff.setPassword(passwordEncoder.encode(staffReqUpdateDto.getPassword()));
-            staff.setDepartment(departmentService.getDepartmentById(staffReqUpdateDto.getDepartmentId()));
-            staff.setRole(roleService.getRoleById(staffReqUpdateDto.getRoleId()));
-            staff.setDesignation(staffReqUpdateDto.getDesignation());
-
-            staff = staffRepository.save(staff);
-
-        responseDto= new ResponseDto("SUCCESS", "Staff Updated Successfully", staff.getId());
-        }
-        catch (Exception e) {
-        e.printStackTrace();
-        responseDto= new ResponseDto("Error", "Staff email already exists","" );
     }
-        return responseDto;
-    }*/
 
     public ResponseDto updateStaff(StaffReqUpdateDto staffReqUpdateDto) throws IOException {
         log.info("StaffService request # {}", staffReqUpdateDto);

@@ -721,9 +721,7 @@ public class VisitService {
     public Visit getVisitById(Integer id) throws RuntimeException {
         return visitRepository.findById(id).orElseThrow(() -> new RuntimeException("No Visit found for ID " + id));
     }
-    public Visit createNewVisit(Visit visitorDetails) {
-        return visitRepository.save(visitorDetails);
-    }
+
     public void updateInActive(Integer id) {
         visitRepository.updateInActive(id);
     }

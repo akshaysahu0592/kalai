@@ -76,19 +76,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/swagger-ui/**"
 
     };
-    @Bean
-    public SecretKey generateKey() throws NoSuchAlgorithmException {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-        keyGenerator.init(128);
-        SecretKey key = keyGenerator.generateKey();
-        return key;
-    }
-    @Bean
-    public IvParameterSpec generateIv() {
-        byte[] iv = new byte[16];
-        new SecureRandom().nextBytes(iv);
-        return new IvParameterSpec(iv);
-    }
 
     @Override
     public void configure (HttpSecurity http) throws Exception {

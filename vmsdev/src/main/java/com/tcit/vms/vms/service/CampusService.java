@@ -13,15 +13,7 @@ import java.util.stream.Collectors;
 public class CampusService {
     @Autowired
     private CampusRepository campusRepository;
-    /*public ResponseDto getAllCampus() {
-         List<Campus> campusList = (List<Campus>) campusRepository.findAll();
-            if(campusList == null){
-                return new ResponseDto("No Campus Available", "");
-            }
-            List<Campus> campusList1=campusList.stream().filter(Campus::isActive).collect(Collectors.toList());
-            return new ResponseDto("AllCampus",campusList );
-        }
-*/
+
 
     public List<Campus> getCampusList() {
             List<Campus> campusList= campusRepository.findAll();

@@ -14,15 +14,7 @@ public class DepartmentService {
     @Autowired
     private DepartmentRepository departmentRepository;
 
-   /* public ResponseDto getAllDepartment() {
-        List<Department> departmentList = (List<Department>) departmentRepository.findAll();
-        if(departmentList == null){
-            return new ResponseDto("No Department Available", "");
-        }
-        List<Department> departmentList1=departmentList.stream().filter(Department::isActive).collect(Collectors.toList());
-        return new ResponseDto("AllDepartment",departmentList );
-    }
-*/
+
    public Department getDepartmentById(Integer departmentId) throws UserNotFoundException {
         Optional <Department> userOptional = departmentRepository.findById(departmentId);
         if(userOptional.isPresent()){
